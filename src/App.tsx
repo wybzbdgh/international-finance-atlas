@@ -4,7 +4,7 @@ import { ArrowDownRight, ArrowRight, ArrowUpRight, BookOpen, ChevronDown, Extern
 
 type Rate = { date: string; base: string; quote: string; rate: number }
 type Country = { id: number; iso: string; name: string; nameEn: string; currency: string | null; continent: string; labelX: number; labelY: number }
-type Feature = { type: 'Feature'; id: number; properties: Country; geometry: GeoJSON.Geometry }
+type Feature = { type: 'Feature'; id: number; properties: Omit<Country, 'id'>; geometry: GeoJSON.Geometry }
 type FeatureCollection = { type: 'FeatureCollection'; features: Feature[] }
 type ViewMode = 'globe' | 'flat'
 type MapMode = 'atlas' | 'change'
@@ -104,8 +104,9 @@ function App() {
     const controller = new AbortController()
     const url = `${import.meta.env.BASE_URL}data/countries.json`
     fetch(url, { signal: controller.signal }).then(r => { if (!r.ok) throw Error('country data'); return r.json() }).then((data: FeatureCollection) => {
-      setCountries(data.features.map(f => f.properties))
-      setSelected(data.features.find(f => f.properties.iso === 'CHN')?.properties || data.features[0].properties)
+      setCountries(data.features.map(f => ({ ...f.properties, id: f.id })))
+      const initial = data.features.find(f => f.properties.iso === 'CHN') || data.features[0]
+      setSelected({ ...initial.properties, id: initial.id })
       if (!mapEl.current) return
       const map = new maplibregl.Map({
         container: mapEl.current,
@@ -129,7 +130,8 @@ function App() {
       map.once('load', () => map.setProjection({ type: 'globe' }))
       map.on('click', 'countries-fill', e => {
         const feature = e.features?.[0] as MapGeoJSONFeature | undefined
-        const country = data.features.find(f => f.id === feature?.id)?.properties
+        const found = data.features.find(f => f.id === feature?.id)
+        const country = found ? { ...found.properties, id: found.id } : null
         if (country) setSelected(country)
       })
       map.on('mousemove', 'countries-fill', e => {
