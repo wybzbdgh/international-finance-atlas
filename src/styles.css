@@ -59,15 +59,14 @@ h1, h2, h3, p, figure, blockquote, dl, dd { margin: 0; }
 h1, h2, h3 { font-weight: 550; }
 h1, .brand strong, .brand-mark, .footer-identity > span,
 .learning-path h2, .learning-path h3, .map-to-order h2,
-.prose-section h2, .classic-reading h2, .course-module h2, .lecture-row h3,
-.index-source h2, .lesson-intro h1 {
+.prose-section h2, .classic-reading h2, .lesson-intro h1 {
   font-family: var(--font-serif);
   font-weight: 600;
   letter-spacing: .01em;
 }
-.order-copy > p, .index-intro > p, .lesson-scene > p,
-.prediction > p, .prediction-feedback p, .prose-section > p:not(.excerpt-source),
-.theory-detail > p:not(.excerpt-source), .classic-reading > p:not(.excerpt-source),
+.order-copy > p, .lesson-scene > p,
+.prediction > p, .prediction-feedback p, .prose-section > p,
+.theory-detail > p, .classic-reading > p,
 .lesson-takeaway p { font-family: var(--font-serif); }
 button, input { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
@@ -193,7 +192,7 @@ svg { flex-shrink: 0; stroke-width: 1.6; }
 .atlas-caption { padding: 18px 0 28px; border-bottom: 1px solid var(--line); display: flex; gap: 36px; justify-content: space-between; align-items: baseline; }
 .atlas-caption p { color: var(--muted); font-size: 11px; max-width: 850px; line-height: 1.8; }
 .atlas-caption a { display: flex; gap: 7px; align-items: center; flex-shrink: 0; color: var(--body); font-size: 11px; }
-.map-to-order { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; padding: 65px 0 44px; }
+.map-to-order { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; padding: 65px 0 85px; }
 .map-to-order h2 { font-size: 29px; letter-spacing: .01em; }
 .map-to-order p { color: var(--body); margin-top: 13px; max-width: 470px; line-height: 1.9; font-size: 14px; }
 .order-bridge { display: flex; justify-content: space-between; align-items: center; gap: 20px; background: var(--surface); padding: 27px 32px; border-radius: 12px; border: 1px solid var(--line-soft); }
@@ -202,12 +201,11 @@ svg { flex-shrink: 0; stroke-width: 1.6; }
 .bridge-amount small { display: block; color: var(--muted); font: 12px/1.8 var(--font-sans); letter-spacing: 0; }
 .bridge-arrow { color: var(--accent); }
 .bridge-question { font-size: 17px; line-height: 1.7; }
-.course-index-link { margin-bottom: 55px; }
 
 /* Order guide has a photographic introduction and a sequential reading path. */
 .order-page { padding-top: 62px; }
 .order-intro { display: grid; grid-template-columns: 1fr 1.15fr; gap: 70px; align-items: center; }
-.order-copy h1, .index-intro h1 { font-size: clamp(38px, 3.8vw, 58px); line-height: 1.4; letter-spacing: .02em; }
+.order-copy h1 { font-size: clamp(38px, 3.8vw, 58px); line-height: 1.4; letter-spacing: .02em; }
 .order-copy > p { color: var(--body); line-height: 1.95; margin: 26px 0 30px; max-width: 460px; font-size: 15px; }
 .order-image { position: relative; }
 .order-image img { display: block; width: 100%; height: 360px; object-fit: cover; border-radius: 12px; }
@@ -270,8 +268,6 @@ svg { flex-shrink: 0; stroke-width: 1.6; }
 .prose-section { margin-bottom: 39px; }
 .prose-section h2 { font-size: 23px; line-height: 1.6; margin-bottom: 18px; letter-spacing: .01em; text-wrap: balance; }
 .prose-section > p { font-size: 17px; line-height: 2.05; color: var(--body); margin-bottom: 19px; text-align: start; overflow-wrap: break-word; }
-.prose-section > .excerpt-source, .theory-detail > .excerpt-source,
-.classic-reading > .excerpt-source { font-family: var(--font-sans); font-size: 11px; line-height: 1.9; color: var(--muted); margin: 8px 0 19px; }
 blockquote { border-left: 2px solid var(--accent); margin: 25px 0; padding: 3px 0 3px 19px; }
 blockquote p { font-size: 16px; line-height: 1.9; }
 blockquote cite { display: block; font-style: normal; color: var(--muted); font-size: 11px; margin-top: 12px; }
@@ -283,7 +279,6 @@ details[open] summary svg { transform: rotate(90deg); }
 .theory-detail summary { font-size: 13px; color: var(--body); line-height: 1.8; }
 .theory-detail[open] summary { color: var(--accent); }
 .theory-detail > p { padding: 13px 0 3px; color: var(--body); font-size: 16px; line-height: 2; }
-.theory-detail > .excerpt-source { padding: 0; margin-bottom: 2px; }
 .classic-reading { background: var(--surface); padding: 25px 26px; border-radius: 12px; margin-top: 45px; }
 .reading-author { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
 .classic-reading h2 { font-size: 20px; line-height: 1.6; }
@@ -296,9 +291,6 @@ details[open] summary svg { transform: rotate(90deg); }
 .lesson-takeaway { border-block: 1px solid var(--line); padding: 26px 0; margin-top: 40px; }
 .lesson-takeaway > span { font-size: 12px; color: var(--accent); }
 .lesson-takeaway p { font-size: 16px; line-height: 1.95; margin-top: 12px; }
-.lesson-reference { margin-top: 25px; color: var(--muted); font-size: 11px; line-height: 1.9; }
-.lesson-reference strong { font-weight: 500; color: var(--body); }
-.lesson-reference p { margin-top: 8px; }
 .lesson-pagination { display: flex; justify-content: space-between; gap: 20px; margin-top: 40px; }
 .lesson-pagination a { display: flex; align-items: center; gap: 12px; font-size: 13px; }
 .lesson-pagination a:hover { color: var(--accent); }
@@ -386,31 +378,6 @@ input[type='range'] { width: 100%; height: 25px; margin: 9px 0 0; accent-color: 
 .custody-note strong { display: block; font-size: 14px; font-weight: 500; margin-top: 4px; }
 .custody-note p { font-size: 11px; color: var(--body); line-height: 1.9; margin-top: 7px; }
 
-/* Course lookup follows the actual six-module syllabus. */
-.index-page { padding-top: 63px; padding-bottom: 70px; }
-.index-intro { max-width: 750px; }
-.index-intro > p { color: var(--body); font-size: 15px; line-height: 1.95; margin-top: 25px; max-width: 600px; }
-.index-search { display: flex; flex-direction: column; gap: 10px; max-width: 640px; margin: 38px 0 54px; }
-.index-search > span { font-size: 12px; color: var(--body); }
-.index-search input { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 13px 16px; color: var(--text); font-size: 14px; min-height: 48px; }
-.course-module { display: grid; grid-template-columns: 240px 1fr; gap: 55px; padding-top: 25px; border-top: 1px solid var(--line); margin-bottom: 36px; }
-.course-module h2 { font-size: 21px; line-height: 1.6; letter-spacing: .01em; }
-.lecture-row { display: grid; grid-template-columns: 72px 1fr auto; gap: 18px; padding: 0 0 22px; }
-.lecture-row + .lecture-row { padding-top: 21px; border-top: 1px solid var(--line-soft); }
-.lecture-number { color: var(--muted); font-size: 11px; padding-top: 4px; font-variant-numeric: tabular-nums; }
-.lecture-row h3 { font-size: 18px; font-weight: 600; }
-.lecture-row p { color: var(--body); font-size: 12px; line-height: 1.9; margin-top: 7px; }
-.lecture-row small { display: block; color: var(--muted); font-size: 10px; margin-top: 8px; }
-.lecture-destination { display: flex; align-items: flex-start; gap: 10px; color: var(--accent); font-size: 11px; padding-top: 4px; white-space: nowrap; }
-.lecture-row:hover h3 { color: var(--accent); }
-.index-source { border-top: 1px solid var(--line); padding-top: 30px; margin-top: 28px; max-width: 900px; }
-.index-source h2 { font-size: 22px; }
-.index-source p { color: var(--muted); font-size: 12px; line-height: 1.9; margin-top: 15px; }
-.index-source a { margin-top: 20px; }
-.index-empty { margin: 40px 0 80px; }
-.index-empty h2 { font-size: 23px; }
-.index-empty p { color: var(--muted); margin: 14px 0; font-size: 14px; }
-
 .site-footer { border-top: 1px solid var(--line); padding: 27px 0 31px; }
 .site-footer > div { display: flex; align-items: center; justify-content: space-between; gap: 35px; }
 .footer-identity > span { font-size: 18px; font-weight: 500; }
@@ -468,8 +435,6 @@ input[type='range'] { width: 100%; height: 25px; margin: 9px 0 0; accent-color: 
   .order-bridge { padding: 24px; gap: 12px; }
   .bridge-amount { font-size: 27px; }
   .bridge-question { font-size: 15px; }
-  .course-module { grid-template-columns: 190px 1fr; gap: 25px; }
-  .lecture-destination { font-size: 0; gap: 0; }
 }
 @media (max-width: 767px) {
   .shell { width: calc(100% - 40px); }
@@ -514,16 +479,15 @@ input[type='range'] { width: 100%; height: 25px; margin: 9px 0 0; accent-color: 
   .quick-countries button { min-height: 41px; font-size: 12px; }
   .atlas-caption { padding: 14px 0 26px; flex-direction: column; gap: 13px; }
   .atlas-caption p { font-size: 11px; }
-  .map-to-order { grid-template-columns: 1fr; padding: 43px 0 25px; gap: 24px; }
+  .map-to-order { grid-template-columns: 1fr; padding: 43px 0 65px; gap: 24px; }
   .map-to-order h2 { font-size: 25px; }
   .map-to-order p { font-size: 13px; }
   .order-bridge { padding: 23px; }
   .bridge-amount { font-size: 32px; }
-  .course-index-link { margin-bottom: 40px; }
-  .order-page, .index-page { padding-top: 36px; }
+  .order-page { padding-top: 36px; }
   .order-intro { grid-template-columns: 1fr; gap: 30px; }
   .context-label { margin-bottom: 20px; font-size: 12px; }
-  .order-copy h1, .index-intro h1 { font-size: 36px; }
+  .order-copy h1 { font-size: 36px; }
   .order-copy > p { font-size: 14px; margin: 21px 0 25px; }
   .order-image img { height: auto; aspect-ratio: 16/10; }
   .order-image figcaption { font-size: 9px; }
@@ -565,23 +529,11 @@ input[type='range'] { width: 100%; height: 25px; margin: 9px 0 0; accent-color: 
   .prose-section { margin-bottom: 33px; }
   .prose-section h2 { font-size: 22px; }
   .prose-section > p { font-size: 16px; line-height: 2; }
-  .prose-section > .excerpt-source { font-size: 11px; }
   .theory-detail summary { font-size: 13px; }
   .classic-reading { padding: 22px; }
   .classic-reading h2 { font-size: 19px; }
   .classic-reading > p { font-size: 15px; }
-  .classic-reading > .excerpt-source { font-size: 11px; }
   .lesson-takeaway p { font-size: 15px; }
-  .index-intro > p { font-size: 14px; }
-  .index-search { margin: 30px 0 40px; }
-  .index-search input { font-size: 12px; }
-  .course-module { grid-template-columns: 1fr; gap: 22px; padding-top: 22px; margin-bottom: 27px; }
-  .course-module h2 { font-size: 22px; }
-  .lecture-row { grid-template-columns: 51px 1fr 18px; gap: 9px; padding-bottom: 19px; }
-  .lecture-row h3 { font-size: 16px; }
-  .lecture-row p { font-size: 12px; }
-  .lecture-number { font-size: 10px; }
-  .index-source { margin-top: 15px; }
   .site-footer > div { flex-direction: column; align-items: flex-start; gap: 20px; }
   .footer-sources { gap: 12px 20px; font-size: 9px; }
 }

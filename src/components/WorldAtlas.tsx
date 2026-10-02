@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import maplibregl, { type Map as MapLibreMap } from 'maplibre-gl'
-import { ArrowDownRight, ArrowRight, ArrowUpRight, ChevronDown, Globe2, Maximize2, RotateCcw, Search, X } from 'lucide-react'
+import { ArrowDownRight, ArrowRight, ArrowUpRight, Globe2, Maximize2, RotateCcw, Search, X } from 'lucide-react'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
 type Rate = { date: string; base: string; quote: string; rate: number }
@@ -279,6 +279,5 @@ export default function WorldAtlas({ theme, visible }: { theme: 'dark' | 'light'
       <div><h2>出口业务中的汇率风险</h2><p>一笔 10 万美元的出口货款，三个月后到账。人民币收入取决于收款日汇率和企业的套期安排。</p></div>
       <a className="order-bridge" href="#learn/accounts"><span className="bridge-amount">$100,000<small>出口应收款</small></span><span className="bridge-arrow"><ArrowRight size={26} /></span><span className="bridge-question">国际收支<br />与汇率敞口</span></a>
     </section>
-    <a className="inline-link course-index-link" href="#index">查看课程索引<ChevronDown size={15} /></a>
   </main>
 }
