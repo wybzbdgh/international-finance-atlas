@@ -1,21 +1,8 @@
 import { useState } from 'react'
-import { ArrowDown, ArrowRight, Check, ChevronRight, RotateCcw } from 'lucide-react'
-import type { LessonId } from '../content'
-
-const money = (n: number) => new Intl.NumberFormat('zh-CN', { maximumFractionDigits: 0 }).format(n)
-const value = (n: number) => n.toFixed(2)
-
-function Slider({ label, amount, unit, min, max, step = 1, onChange }: { label: string; amount: number; unit?: string; min: number; max: number; step?: number; onChange: (n: number) => void }) {
-  return <label className="range-field">
-    <span className="range-heading"><span>{label}</span><strong>{step < 1 ? value(amount) : amount}<small>{unit}</small></strong></span>
-    <input type="range" min={min} max={max} step={step} value={amount} onChange={e => onChange(Number(e.target.value))} />
-    <span className="range-limits"><span>{min}</span><span>{max}</span></span>
-  </label>
-}
-
-function Reset({ onClick }: { onClick: () => void }) {
-  return <button className="text-button reset" onClick={onClick}><RotateCcw size={14} />恢复初始值</button>
-}
+import { ArrowDown, ArrowRight, Check, ChevronRight } from 'lucide-react'
+import type { ExperimentId, LessonId } from '../content'
+import { money, Slider, Reset, Tabs } from './ExperimentUI'
+import { Arbitrage, Prices, Parity, Overshoot, Debt, Funding, Hedge, Stablecoin, Sharing, Trilemma, Iip } from './AdvancedExperiments'
 
 function Accounts() {
   const [stage, setStage] = useState(0)
@@ -43,51 +30,6 @@ function Accounts() {
   </>
 }
 
-function Exchange() {
-  const [tab, setTab] = useState('hedge')
-  const [spot, setSpot] = useState(6.5)
-  const [forward, setForward] = useState(6.95)
-  const [ratio, setRatio] = useState(100)
-  const [priceCN, setPriceCN] = useState(140)
-  const [priceUS, setPriceUS] = useState(20)
-  const [cnyInterest, setCnyInterest] = useState(2)
-  const [usdInterest, setUsdInterest] = useState(5)
-  const cash = 100000 * (ratio / 100 * forward + (1 - ratio / 100) * spot)
-  const cip = 7 * (1 + cnyInterest / 100 * 0.25) / (1 + usdInterest / 100 * 0.25)
-  return <>
-    <div className="experiment-heading"><h2>汇率与套期保值计算</h2><p>订单金额 10 万美元，三个月后收款。</p></div>
-    <div className="segmented" aria-label="汇率实验">{[['hedge', '远期套期'], ['ppp', 'PPP'], ['cip', '远期定价']].map(([id, text]) => <button key={id} aria-pressed={tab === id} className={tab === id ? 'active' : ''} onClick={() => setTab(id)}>{text}</button>)}</div>
-    {tab === 'hedge' ? <div className="experiment-content">
-      <Slider label="收款日即期汇率" amount={spot} unit="CNY / USD" min={6} max={8} step={0.01} onChange={setSpot} />
-      <Slider label="约定的远期汇率" amount={forward} unit="CNY / USD" min={6} max={8} step={0.01} onChange={setForward} />
-      <Slider label="远期套期比例" amount={ratio} unit="%" min={0} max={100} step={25} onChange={setRatio} />
-      <div className="cash-results" aria-live="polite">
-        <div><span>不套期</span><strong><small>¥</small>{money(100000 * spot)}</strong></div>
-        <div className="accent-result"><span>套期后的人民币收入</span><strong><small>¥</small>{money(cash)}</strong></div>
-      </div>
-      <p className="result-explanation">{ratio === 100 ? '全部套期时，改变到期即期汇率，人民币收入不再变化。' : ratio === 0 ? '未套期时，汇率每变动 0.10 元，人民币收入变化 1 万元。' : '只有未套期部分随到期即期汇率变化。'} 套期结果与不套期结果的差额取决于到期即期汇率。</p>
-      <Reset onClick={() => { setSpot(6.5); setForward(6.95); setRatio(100) }} />
-    </div> : tab === 'ppp' ? <div className="experiment-content">
-      <p>假设两国消费篮子的商品、数量及权重相同。</p>
-      <Slider label="中国一篮子商品价格" amount={priceCN} unit="人民币" min={100} max={200} onChange={setPriceCN} />
-      <Slider label="美国一篮子商品价格" amount={priceUS} unit="美元" min={15} max={30} onChange={setPriceUS} />
-      <div className="formula">E<sub>PPP</sub> = P / P*</div>
-      <div className="single-result" aria-live="polite"><span>绝对购买力平价基准</span><strong>{value(priceCN / priceUS)}<small>CNY / USD</small></strong></div>
-      <p className="result-explanation">计算值为该消费篮子的隐含 PPP 汇率。运输成本、税费、非贸易品及篮子差异均可能使市场汇率偏离。</p>
-      <Reset onClick={() => { setPriceCN(140); setPriceUS(20) }} />
-    </div> : <div className="experiment-content">
-      <p>即期汇率设为 7.00，期限为三个月。比较同期限存款与远期锁定的终值。</p>
-      <Slider label="人民币年化利率" amount={cnyInterest} unit="%" min={0} max={8} step={0.25} onChange={setCnyInterest} />
-      <Slider label="美元年化利率" amount={usdInterest} unit="%" min={0} max={8} step={0.25} onChange={setUsdInterest} />
-      <div className="formula small-formula">F = E × (1 + i<sub>CNY</sub>T) / (1 + i<sub>USD</sub>T)</div>
-      <div className="single-result" aria-live="polite"><span>CIP 隐含的三个月远期</span><strong>{cip.toFixed(4)}<small>CNY / USD</small></strong></div>
-      <p className="result-explanation">采用简单计息，T = 0.25。公式给出无套利条件下的远期价格，不是对到期即期汇率的预测。</p>
-      <Reset onClick={() => { setCnyInterest(2); setUsdInterest(5) }} />
-    </div>}
-    <div className="experiment-foot">全部参数为教学假设。未计买卖价差、授信、手续费、违约和结算差异。</div>
-  </>
-}
-
 const transmissions = {
   'floating-money': {
     steps: ['央行增加货币供给', '短期利率下降', '资本配置转向外币资产', '本币贬值，净出口增加'],
@@ -111,6 +53,24 @@ const transmissions = {
   }
 }
 
+function PolicyDiagram({ regime, policy }: { regime: 'floating' | 'fixed'; policy: 'money' | 'fiscal' }) {
+  const temporary = regime === 'fixed' && policy === 'money'
+  const isIntercept = temporary ? 9 : policy === 'fiscal' ? (regime === 'fixed' ? 11 : 10.4) : 10
+  const lmIntercept = temporary ? -1.5 : policy === 'money' ? -1.5 : regime === 'fixed' ? -1 : 0
+  const finalY = temporary ? 6 : (isIntercept - lmIntercept) / 1.5
+  const finalI = temporary ? 3 : finalY * 0.5 + lmIntercept
+  const px = (y: number) => 36 + y / 12 * 276
+  const py = (i: number) => 183 - i / 9 * 153
+  const curve = (intercept: number, slope: number) => [slope > 0 ? Math.max(2, -intercept / slope) : 2, slope < 0 ? Math.min(10, -intercept / slope) : 10].map(y => px(y) + ',' + py(intercept + slope * y)).join(' ')
+  return <figure className="model-chart policy-chart"><figcaption>IS–LM 调整示意</figcaption><svg viewBox="0 0 340 223" role="img" aria-label={temporary ? '货币扩张暂时推动 LM 右移，维持固定汇率的干预使 LM 回到原位。' : '新均衡的产出上升；' + (finalI > 3 ? '利率上升。' : finalI < 3 ? '利率下降。' : '利率不变。')}>
+    <title>IS–LM 调整示意</title><line x1="36" y1="183" x2="321" y2="183" className="plot-axis"/><line x1="36" y1="183" x2="36" y2="22" className="plot-axis"/><text x="24" y="19">i</text><text x="322" y="201">Y</text>
+    <polyline points={curve(9,-1)} className="policy-original"/><polyline points={curve(0,0.5)} className="policy-original"/><text x={px(9)} y={py(0)+18}>IS₀</text><text x={px(10)} y={py(5)-10}>LM₀</text>
+    <polyline points={curve(isIntercept,-1)} className={temporary ? 'policy-original' : 'plot-line'}/><polyline points={curve(lmIntercept,0.5)} className={temporary ? 'plot-reference' : 'plot-line'}/>
+    <circle cx={px(6)} cy={py(3)} r="3" className="policy-initial-point"/><text x={px(6)-17} y={py(3)-10}>E₀</text><circle cx={px(finalY)} cy={py(finalI)} r="4" className="plot-point"/><text x={px(finalY)+8} y={py(finalI)+17}>{temporary ? 'E₁ = E₀' : 'E₁'}</text>
+    <text x="40" y="219">{temporary ? '虚线：暂时的货币扩张' : '灰线：初始状态；绿色：调整后的曲线'}</text>
+  </svg><p className="plot-key">曲线用于表示方向，斜率与位移不代表实际估计。</p></figure>
+}
+
 function Policy() {
   const [regime, setRegime] = useState<'floating' | 'fixed'>('floating')
   const [policy, setPolicy] = useState<'money' | 'fiscal'>('money')
@@ -120,6 +80,7 @@ function Policy() {
     <div className="experiment-heading"><h2>汇率制度与政策传导</h2><p>比较两种制度下的货币扩张与财政扩张。</p></div>
     <fieldset className="choice-field"><legend>汇率制度</legend><div className="segmented">{[['floating', '浮动汇率'], ['fixed', '固定汇率']].map(([id, name]) => <button key={id} className={regime === id ? 'active' : ''} aria-pressed={regime === id} onClick={() => setRegime(id as typeof regime)}>{name}</button>)}</div></fieldset>
     <fieldset className="choice-field"><legend>扩张政策</legend><div className="segmented">{[['money', '增加货币供给'], ['fiscal', '增加政府购买']].map(([id, name]) => <button key={id} className={policy === id ? 'active' : ''} aria-pressed={policy === id} onClick={() => setPolicy(id as typeof policy)}>{name}</button>)}</div></fieldset>
+    <PolicyDiagram regime={regime} policy={policy} />
     <ol className="transmission" key={regime + policy} aria-live="polite">{selected.steps.map((step, i) => <li key={step}><span className="chain-number">{i + 1}</span><span>{step}</span>{i < 3 && <ArrowDown size={13} className="chain-arrow" />}</li>)}</ol>
     <p className="result-explanation">{selected.result}</p>
     <details className="triangle-detail"><summary>三元悖论<ChevronRight size={15} /></summary><div className="triangle-summary">{selected.triangle.map(item => <span key={item}><Check size={14} />{item}</span>)}<strong>{selected.constraint}</strong></div><label className="check-field"><input type="checkbox" checked={restricted} onChange={e => setRestricted(e.target.checked)} />考虑资本流动管理</label><p>{restricted ? '资本流动管理限制跨境资产转换，国内外利差可能持续。上述完全流动条件下的传导不再直接适用。' : '以上传导假设资本自由流动、资产可替代且风险溢价给定。'}</p></details>
@@ -154,8 +115,9 @@ const paymentLayers = [
   { title: '结算', usd: '相应美元账户完成划转，收款银行贷记客户账户。实际路径可能涉及代理行或银行内部账簿。', cny: '相应人民币结算资产完成划转。相关银行可通过 CIPS 或其他适用安排完成跨境支付。' }
 ]
 
-function System() {
-  const [currency, setCurrency] = useState<'usd' | 'cny'>('usd')
+function System({ initialCurrency = 'usd' }: { initialCurrency?: 'usd' | 'cny' }) {
+  const [currency, setCurrency] = useState<'usd' | 'cny'>(initialCurrency)
+  const [restriction, setRestriction] = useState<'none' | 'message' | 'clearing' | 'settlement' | 'custody'>('none')
   const [layer, setLayer] = useState(0)
   return <>
     <div className="experiment-heading"><h2>跨境支付的四个环节</h2><p>选择合同币种和支付环节，查看对应安排。</p></div>
@@ -163,10 +125,22 @@ function System() {
     <div className="payment-route">{paymentLayers.map((item, i) => <button key={item.title} className={i === layer ? 'selected' : ''} aria-pressed={i === layer} onClick={() => setLayer(i)}><span className="chain-number">{i + 1}</span><span>{item.title}</span><ChevronRight size={16} /></button>)}</div>
     <div className="payment-description" key={currency + layer} aria-live="polite"><h3>{paymentLayers[layer].title}</h3><p>{paymentLayers[layer][currency]}</p></div>
     <div className="custody-note"><span>资产控制</span><strong>托管</strong><p>托管机构记录和控制证券等金融资产，影响出售、质押、付息与划转。托管与上述支付环节并行。</p></div>
+    <label className="select-field"><span>限制发生在哪里</span><select value={restriction} onChange={event => setRestriction(event.target.value as typeof restriction)}><option value="none">没有额外限制</option><option value="message">报文网络接入</option><option value="clearing">清算参与资格</option><option value="settlement">结算账户或代理行</option><option value="custody">托管资产冻结</option></select></label>
+    {restriction !== 'none' && <div className="risk-feedback" role="status">{restriction === 'message' ? '失去报文网络接入会妨碍指令传递，但不等于账户资金自动被冻结。替代报文也需要银行接受和认证。' : restriction === 'clearing' ? '无法参与原清算安排时，需要寻找合法可行的参与机构或替代路径；这并不保证结算账户可以使用。' : restriction === 'settlement' ? '结算账户或代理行关系受限，会妨碍资金最终划转。报文送达也不能保证收款。' : '托管资产冻结会限制相关证券或储备资产的转让、出售及使用。它与支付报文是否送达是不同问题。'} 更换合同币种并不自动改变机构受到的限制；仍须核对参与银行、资产和适用规则。</div>}
+    <Reset onClick={() => { setCurrency(initialCurrency); setLayer(0); setRestriction('none') }} />
     <div className="experiment-foot">路径示意。实际安排取决于开户关系、代理行网络和支付系统规则。</div>
   </>
 }
 
-export default function Experiment({ lesson }: { lesson: LessonId }) {
-  return <div className="experiment-panel">{lesson === 'accounts' ? <Accounts /> : lesson === 'exchange' ? <Exchange /> : lesson === 'policy' ? <Policy /> : lesson === 'crisis' ? <Crisis /> : <System />}</div>
+function AccountsWithValuation() {
+  const [tab, setTab] = useState<'ledger' | 'valuation'>('ledger')
+  return <><Tabs value={tab} onChange={setTab} label="国际账户计算" items={[["ledger", "复式记账"], ["valuation", "估值与净头寸"]]} /><div className="calculator-body">{tab === 'ledger' ? <Accounts /> : <Iip />}</div></>
+}
+
+const experimentNames: Record<ExperimentId, string> = { accounts: '国际账户', arbitrage: '三角套利', prices: '价格与汇率', parity: '利率平价', overshoot: '汇率超调', policy: '政策传导', sharing: '风险分担', trilemma: '三元悖论', crisis: '资产负债表', debt: '债务计算', funding: '融资成本', hedge: '套期保值', payment: '跨境支付', stablecoin: '储备与赎回' }
+
+export default function Experiment({ kinds, topicId }: { kinds: ExperimentId[]; topicId: LessonId }) {
+  const [kind, setKind] = useState<ExperimentId>(kinds[0])
+  const content = kind === 'accounts' ? <AccountsWithValuation /> : kind === 'arbitrage' ? <Arbitrage /> : kind === 'prices' ? <Prices /> : kind === 'parity' ? <Parity /> : kind === 'overshoot' ? <Overshoot /> : kind === 'policy' ? <Policy /> : kind === 'sharing' ? <Sharing /> : kind === 'trilemma' ? <Trilemma /> : kind === 'crisis' ? <Crisis /> : kind === 'debt' ? <Debt /> : kind === 'funding' ? <Funding /> : kind === 'hedge' ? <Hedge /> : kind === 'stablecoin' ? <Stablecoin /> : <System initialCurrency={topicId === 'renminbi' ? 'cny' : 'usd'} />
+  return <div className="experiment-panel" data-experiment={kind}>{kinds.length > 1 && <Tabs value={kind} onChange={setKind} label="本篇交互" items={kinds.map(id => [id, experimentNames[id]])} />}<div className={kinds.length > 1 ? 'calculator-body' : ''} key={kind}>{content}</div></div>
 }

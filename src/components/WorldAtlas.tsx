@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import maplibregl, { type Map as MapLibreMap } from 'maplibre-gl'
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Globe2, Maximize2, RotateCcw, Search, X } from 'lucide-react'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import { lessonHref, type LessonId } from '../content'
 
 type Rate = { date: string; base: string; quote: string; rate: number }
 type Country = { id: number; iso: string; name: string; nameEn: string; currency: string | null; continent: string; labelX: number; labelY: number }
@@ -12,7 +13,19 @@ const dateBefore = (days: number) => new Date(Date.now() - days * 86400000).toIS
 const fmt = (n: number, max = 4) => new Intl.NumberFormat('zh-CN', { maximumFractionDigits: max, minimumFractionDigits: n < 10 ? 2 : 0 }).format(n)
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const commonNames: Record<string, string> = { CHN: '中国', USA: '美国', GBR: '英国', DEU: '德国', RUS: '俄罗斯', KOR: '韩国', PRK: '朝鲜', VNM: '越南', IRN: '伊朗', LAO: '老挝' }
-const quickCountries = [{ iso: 'CHN', name: '中国' }, { iso: 'USA', name: '美国' }, { iso: 'JPN', name: '日本' }, { iso: 'GBR', name: '英国' }, { iso: 'DEU', name: '德国' }, { iso: 'BRA', name: '巴西' }]
+const quickCountries = [{ iso: 'CHN', name: '中国' }, { iso: 'USA', name: '美国' }, { iso: 'JPN', name: '日本' }, { iso: 'GBR', name: '英国' }, { iso: 'DEU', name: '德国' }, { iso: 'THA', name: '泰国' }]
+const relatedReadings: Record<string, { id: LessonId; title: string; section?: 'cases' }[]> = {
+  CHN: [{ id: 'regimes', title: '人民币汇率改革与在岸、离岸市场' }, { id: 'renminbi', title: '人民币的境外使用与国际化' }],
+  USA: [{ id: 'dollar', title: '美元体系与全球金融周期' }, { id: 'crisis', title: '2008 年全球金融危机' }],
+  JPN: [{ id: 'long-run', title: '广场协议、日元升值与资产泡沫', section: 'cases' }, { id: 'policy', title: '汇率与宏观政策的传导' }],
+  THA: [{ id: 'currency-crises', title: '1997 年亚洲金融危机', section: 'cases' }, { id: 'crisis', title: '外币债务与货币错配' }],
+  DEU: [{ id: 'sovereign-debt', title: '欧债危机与主权银行反馈', section: 'cases' }, { id: 'regimes', title: '货币联盟与最优货币区' }],
+  GBR: [{ id: 'foundations', title: '英镑与伦敦国际金融网络' }, { id: 'fx-market', title: '全球外汇市场的组织结构' }],
+  RUS: [{ id: 'sanctions', title: '金融制裁与资产冻结', section: 'cases' }, { id: 'dollar', title: '美元网络与国际金融权力' }],
+  ARG: [{ id: 'governance', title: '阿根廷 2018 年 IMF 贷款', section: 'cases' }, { id: 'currency-crises', title: '货币局与汇率危机' }],
+  BRA: [{ id: 'sovereign-debt', title: '新兴市场的外债与再融资风险' }, { id: 'globalization', title: '资本流动结构与金融开放' }],
+}
+const defaultReadings: { id: LessonId; title: string; section?: 'cases' }[] = [{ id: 'fx-market', title: '汇率报价与外汇市场' }, { id: 'long-run', title: '购买力平价与实际汇率' }]
 const palette = {
   dark: { ocean: '#151c24', land: '#374551', border: '#9dabb5', grid: '#b8c8d1', selected: '#81c6b5', outline: '#d5efe7', hover: '#638279', up: '#d39b93', down: '#81c6b5', flat: '#728490' },
   light: { ocean: '#e2e9ed', land: '#a5b6c0', border: '#506779', grid: '#648395', selected: '#468979', outline: '#205b4c', hover: '#93b4a8', up: '#b77b73', down: '#62a18f', flat: '#b5c2c9' }
@@ -272,6 +285,7 @@ export default function WorldAtlas({ theme, visible }: { theme: 'dark' | 'light'
           {selected?.currency === 'USD' ? <p className="chart-message">美元是计价基准。选择其他国家查看变化。</p> : historyState === 'loading' ? <div className="chart-message skeleton" aria-label="正在加载历史走势" /> : historyState === 'error' ? <div className="chart-message">历史数据暂不可用。<button className="text-button" onClick={() => setHistoryRetry(n => n + 1)}>重试</button></div> : <LineChart rows={history} currency={selected?.currency || ''} />}
         </> : <div className="rate-empty"><p>{selected?.currency ? 'Frankfurter 暂未提供该币种报价。' : '此地区未匹配到唯一流通货币。'}</p><small>请选择其他国家查看报价。</small></div>}
         <div className="quick-countries" aria-label="常用国家">{quickCountries.map(country => <button key={country.iso} aria-pressed={selected?.iso === country.iso} className={selected?.iso === country.iso ? 'selected' : ''} onClick={() => { const found = countries.find(c => c.iso === country.iso); if (found) choose(found) }}>{country.name}</button>)}</div>
+        <div className="country-reading"><span>相关课程内容</span>{(relatedReadings[selected?.iso || ''] || defaultReadings).map(item => <a key={item.id} href={lessonHref(item.id, item.section)}>{item.title}<ArrowUpRight size={13} /></a>)}</div>
       </aside>
     </div>
     <div className="atlas-caption"><p>Frankfurter 每日参考价，非盘中实时价。变化为“每美元可兑换的本币数量”的百分比：数值上升表示本币贬值。图层中 ±0.5% 以内视为小幅变化，无报价地区不比较涨跌；所选国家单独高亮。</p><a href="https://frankfurter.dev/" target="_blank" rel="noreferrer">数据说明<ArrowUpRight size={14} /></a></div>

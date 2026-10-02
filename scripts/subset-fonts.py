@@ -16,7 +16,7 @@ if len(font_paths) != 2:
 destination = ROOT / 'src/assets/fonts'
 destination.mkdir(parents=True, exist_ok=True)
 
-text = ''.join(p.read_text() for p in (ROOT / 'src').rglob('*') if p.suffix in {'.ts', '.tsx', '.css'})
+text = ''.join(p.read_text() for p in (ROOT / 'src').rglob('*') if p.suffix in {'.ts', '.tsx', '.css', '.json'})
 text += (ROOT / 'public/data/countries.json').read_text()
 text += ''.join(chr(i) for i in range(32, 127))
 text += '−–—×÷≈≠≤≥∗πρ∆¥￥€£→←↑↓＋％［］（）【】《》“”‘’：；！？、。·'

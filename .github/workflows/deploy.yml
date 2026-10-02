@@ -27,6 +27,7 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm test:models
       - run: pnpm build
       - uses: actions/configure-pages@v5
         with:
