@@ -1,21 +1,27 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronRight, Menu, Moon, Search, Sun, X } from 'lucide-react'
 import { courseModules, lessons, lessonById, lessonHref, type ComparisonTable, type Lesson, type Quiz } from './content'
 import Experiment from './components/Experiments'
 import ReadingActivity from './components/ReadingActivity'
 import { activityTitles } from './activities-data'
 import ReadingFigure from './components/ReadingFigure'
+import MathExpression from './components/MathExpression'
+import { LinkedParagraphs, LessonTheoryReading, theoryLinksForLesson } from './components/TheoryLinks'
+import { theoryIndex } from './theory-navigation'
+import { restoreReadingPosition, saveReadingPosition } from './lib/reading-position'
 
+const TheoryLibrary = lazy(() => import('./components/TheoryLibrary'))
 const WorldAtlas = lazy(() => import('./components/WorldAtlas'))
-type Route = { page: 'map' | 'learn'; lesson?: Lesson; section?: 'cases' | 'readings' }
+type Route = { page: 'map' | 'learn' | 'theory'; lesson?: Lesson; section?: string; theoryId?: string }
 function readRoute(): Route {
   const hash = window.location.hash.slice(1)
+  if (hash === 'theory' || hash.startsWith('theory/')) return { page: 'theory', theoryId: hash.split('/')[1] || undefined }
   if (hash === 'lab') return { page: 'learn', lesson: lessonById('enterprise') }
   if (hash === 'cases') return { page: 'learn', lesson: lessonById('currency-crises') }
   if (['index', 'reading', 'chapters'].includes(hash)) return { page: 'learn' }
   if (hash === 'learn' || hash.startsWith('learn/')) {
     const [, id, section] = hash.split('/')
-    return { page: 'learn', lesson: lessonById(id || ''), section: section === 'cases' || section === 'readings' ? section : undefined }
+    return { page: 'learn', lesson: lessonById(id || ''), section: section || undefined }
   }
   return { page: 'map' }
 }
@@ -76,7 +82,7 @@ function TopicNavigation({ lesson }: { lesson: Lesson }) {
     <a className="back-link" href="#learn"><ArrowLeft size={14} />课程目录</a>
     <label className="mobile-topic-select"><span>选择专题</span><select value={lesson.id} onChange={e => { window.location.hash = lessonHref(e.target.value as Lesson['id']) }}>{courseModules.map(group => <optgroup label={group.title} key={group.id}>{lessons.filter(item => item.moduleId === group.id).map(item => <option value={item.id} key={item.id}>{item.title}</option>)}</optgroup>)}</select></label>
     <div className="desktop-topic-nav"><div className="nav-module-title">{module.title}</div><nav aria-label="当前模块">{lessons.filter(item => item.moduleId === module.id).map(item => <a key={item.id} href={lessonHref(item.id)} aria-current={item.id === lesson.id ? 'page' : undefined}>{item.short}<ChevronRight size={13} /></a>)}</nav>
-      <div className="article-contents"><span>本篇内容</span>{lesson.sections.map(section => <button key={section.id} onClick={() => scrollTo(section.id)}>{section.title}</button>)}{lesson.sections.some(section => section.figure || section.subsections?.some(sub => sub.figure)) && <button className="activity-jump" onClick={() => { const section = lesson.sections.find(s => s.figure || s.subsections?.some(sub => sub.figure)); const figure = section?.subsections?.find(sub => sub.figure)?.figure || section?.figure; if (figure) scrollTo('figure-' + figure) }}>正文图表<ArrowRight size={12} /></button>}{lesson.sections.some(section => section.activity) && <button className="activity-jump" onClick={() => { const activity = lesson.sections.find(section => section.activity)?.activity; if (activity) scrollTo('activity-' + activity) }}>随文交互<ArrowRight size={12} /></button>}{lesson.cases && <button onClick={() => scrollTo('topic-cases')}>历史案例</button>}{lesson.readings && <button onClick={() => scrollTo('topic-readings')}>经典文献</button>}<button onClick={() => scrollTo('topic-quizzes')}>练习与解析</button></div>
+      <div className="article-contents"><span>本篇内容</span>{lesson.sections.map(section => <button key={section.id} onClick={() => scrollTo(section.id)}>{section.title}</button>)}{lesson.sections.some(section => section.figure || section.subsections?.some(sub => sub.figure)) && <button className="activity-jump" onClick={() => { const section = lesson.sections.find(s => s.figure || s.subsections?.some(sub => sub.figure)); const figure = section?.subsections?.find(sub => sub.figure)?.figure || section?.figure; if (figure) scrollTo('figure-' + figure) }}>正文图表<ArrowRight size={12} /></button>}{lesson.sections.some(section => section.activity) && <button className="activity-jump" onClick={() => { const activity = lesson.sections.find(section => section.activity)?.activity; if (activity) scrollTo('activity-' + activity) }}>随文交互<ArrowRight size={12} /></button>}{lesson.cases && <button onClick={() => scrollTo('topic-cases')}>历史案例</button>}{lesson.readings && <button onClick={() => scrollTo('topic-readings')}>经典文献</button>}{theoryIndex.some(entry => entry.lessonIds.includes(lesson.id)) && <button onClick={() => scrollTo('topic-theories')}>理论深思<ArrowUpRight size={12} /></button>}<button onClick={() => scrollTo('topic-quizzes')}>练习与解析</button></div>
       <details className="module-switcher"><summary>其他模块<ChevronRight size={14} /></summary>{courseModules.filter(item => item.id !== module.id).map(item => <a key={item.id} href={lessonHref(lessons.find(topic => topic.moduleId === item.id)!.id)}>{item.title}<ArrowUpRight size={12} /></a>)}</details>
     </div>
   </aside>
@@ -85,15 +91,15 @@ function TopicNavigation({ lesson }: { lesson: Lesson }) {
 function LessonReader({ lesson }: { lesson: Lesson }) {
   const index = lessons.findIndex(item => item.id === lesson.id)
   const module = courseModules.find(item => item.id === lesson.moduleId)!
-  const hasExperiment = lesson.experiments.length > 0
-  return <main className={'shell reader-page page-enter' + (hasExperiment ? '' : ' without-experiment')} data-chapter={lesson.id} id="main-content" tabIndex={-1}>
+  const links = useMemo(() => theoryLinksForLesson(lesson), [lesson])
+  return <main className="shell reader-page page-enter without-experiment" data-chapter={lesson.id} id="main-content" tabIndex={-1}>
     <TopicNavigation lesson={lesson} />
     <section className="lesson-intro"><div className="lesson-position">{module.title}</div><h1>{(titleParts[lesson.id] || [lesson.title]).map(part => <span className="title-phrase" key={part}>{part}</span>)}</h1><p className="lesson-subtitle">{lesson.subtitle}</p><div className="learning-objectives"><h2>学习要求</h2><ul>{lesson.objectives.map(text => <li key={text}>{text}</li>)}</ul></div></section>
-    {hasExperiment && <aside className="lesson-experiment"><Experiment kinds={lesson.experiments} topicId={lesson.id} /><p className="experiment-reading-note">正文与计算使用同一标价法；参数为教学设定。</p></aside>}
     <article className="lesson-body">
-      {lesson.sections.map(section => <section className="prose-section" id={section.id} key={section.id}><h2>{section.title}</h2><Paragraphs texts={section.paragraphs} />{section.subsections?.map(sub => <div className="prose-subsection" key={sub.title}><h3>{sub.title}</h3><Paragraphs texts={sub.paragraphs} />{sub.figure && <ReadingFigure kind={sub.figure} />}</div>)}{section.formulas && <div className="formula-group">{section.formulas.map(item => <div className="reading-formula" key={item.expression}><div className="formula-expression">{item.expression}</div><p>{item.explanation}</p></div>)}</div>}{section.table && <ContentTable table={section.table} />}{section.figure && <ReadingFigure kind={section.figure} />}{section.activity && <ReadingActivity kind={section.activity} />}</section>)}
+      {lesson.sections.map(section => <section className="prose-section" id={section.id} key={section.id}><h2>{section.title}</h2><LinkedParagraphs texts={section.paragraphs} links={links} anchorPrefix={section.id} />{section.subsections?.map((sub, subIndex) => <div className="prose-subsection" key={sub.title}><h3>{sub.title}</h3><LinkedParagraphs texts={sub.paragraphs} links={links} anchorPrefix={section.id + '-sub-' + subIndex} />{sub.figure && <ReadingFigure kind={sub.figure} />}</div>)}{section.formulas && <div className="formula-group">{section.formulas.map(item => <div className="reading-formula" key={item.expression}><MathExpression expression={item.expression} /><p>{item.explanation}</p></div>)}</div>}{section.table && <ContentTable table={section.table} />}{section.figure && <ReadingFigure kind={section.figure} />}{section.activity && <ReadingActivity kind={section.activity} />}{section.experiment && <div className="inline-experiment"><Experiment kinds={[section.experiment]} topicId={lesson.id} /></div>}</section>)}
       {lesson.cases && <section className="case-collection" id="topic-cases"><h2>历史案例</h2>{lesson.cases.map(item => <section className="case-study" key={item.title}><h3>{item.title}</h3><Paragraphs texts={item.paragraphs} /></section>)}</section>}
       {lesson.readings && <section className="reading-collection" id="topic-readings"><h2>经典文献</h2>{lesson.readings.map(item => <section className="classic-reading" key={item.title}><div className="reading-author">{item.author} · {item.year}</div><h3>{item.question}</h3><p>{item.finding}</p><p className="reading-limit">{item.limit}</p><a href={item.href} target="_blank" rel="noreferrer">{item.title}<ArrowUpRight size={17} /></a></section>)}</section>}
+      <LessonTheoryReading lesson={lesson} />
       <section className="quiz-collection" id="topic-quizzes"><h2>练习与解析</h2>{lesson.quizzes.map((quiz, i) => <QuizItem quiz={quiz} number={i + 1} key={quiz.id} />)}</section>
       <nav className="lesson-pagination" aria-label="上一篇和下一篇">{index > 0 ? <a href={lessonHref(lessons[index - 1].id)}><ArrowLeft size={16} /><span><small>上一篇</small>{lessons[index - 1].short}</span></a> : <a href="#learn"><ArrowLeft size={16} /><span>课程目录</span></a>}{index < lessons.length - 1 ? <a href={lessonHref(lessons[index + 1].id)}><span><small>下一篇</small>{lessons[index + 1].short}</span><ArrowRight size={16} /></a> : <a href="#learn"><span>课程目录</span><ArrowRight size={16} /></a>}</nav>
     </article>
@@ -103,12 +109,13 @@ function LessonReader({ lesson }: { lesson: Lesson }) {
 function App() {
   const [route, setRoute] = useState<Route>(readRoute)
   const [menuOpen, setMenuOpen] = useState(false)
+  const previousHash = useRef(window.location.hash)
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     try { return localStorage.getItem('finance-atlas-theme') === 'light' ? 'light' : 'dark' } catch { return 'dark' }
   })
   const [mapVisited, setMapVisited] = useState(route.page === 'map')
   useEffect(() => {
-    const update = () => { const next = readRoute(); setRoute(next); setMenuOpen(false); if (next.page === 'map') setMapVisited(true); window.scrollTo({ top: 0, behavior: 'instant' }) }
+    const update = () => { saveReadingPosition(previousHash.current); previousHash.current = window.location.hash; const next = readRoute(); setRoute(next); setMenuOpen(false); if (next.page === 'map') setMapVisited(true) }
     window.addEventListener('hashchange', update)
     return () => window.removeEventListener('hashchange', update)
   }, [])
@@ -118,19 +125,26 @@ function App() {
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#11161d' : '#f1f4f6')
     try { localStorage.setItem('finance-atlas-theme', theme) } catch { /* Theme also works without storage. */ }
   }, [theme])
-  useEffect(() => { document.title = (route.lesson?.short || (route.page === 'learn' ? '课程读本' : '全球汇率')) + ' · 国际金融' }, [route])
+  useEffect(() => { document.title = (route.lesson?.short || (route.page === 'theory' ? theoryIndex.find(entry => entry.id === route.theoryId)?.title || '理论深思' : route.page === 'learn' ? '课程读本' : '全球汇率')) + ' · 国际金融' }, [route])
   useEffect(() => {
-    if (route.lesson && route.section) document.getElementById('topic-' + route.section)?.scrollIntoView({ block: 'start', behavior: 'instant' })
+    const selector = route.page === 'map' ? 'main#atlas:not([hidden])' : route.page === 'theory' ? (route.theoryId ? '.theory-reader' : '.theory-directory') : route.lesson ? '.reader-page' : '.course-overview'
+    const section = route.section ? (['cases', 'readings', 'theories'].includes(route.section) ? 'topic-' + route.section : route.section) : undefined
+    return restoreReadingPosition(window.location.hash, selector, section)
   }, [route])
+  useEffect(() => {
+    const previous = history.scrollRestoration; history.scrollRestoration = 'manual'
+    return () => { history.scrollRestoration = previous }
+  }, [])
   return <>
     <a className="skip-link" href="#main-content" onClick={e => { e.preventDefault(); const main = document.querySelector('main:not([hidden])') as HTMLElement | null; main?.focus(); main?.scrollIntoView() }}>跳到主要内容</a>
     <header className="site-header"><div className="header-inner shell">
       <a className="brand" href="#map" aria-label="光华管理学院，回到全球汇率"><svg className="brand-filter" aria-hidden="true" width="0" height="0"><defs><filter id="guanghua-white" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 -1 0 0 1" /><feComposite in2="SourceAlpha" operator="in" /></filter></defs></svg><img className="guanghua-logo" src={import.meta.env.BASE_URL + 'assets/guanghua-original.png'} alt="北京大学光华管理学院" width="442" height="96" /></a>
-      <nav className={'main-nav' + (menuOpen ? ' open' : '')} aria-label="主导航"><a href="#map" aria-current={route.page === 'map' ? 'page' : undefined}>全球汇率</a><a href="#learn" aria-current={route.page === 'learn' ? 'page' : undefined}>课程读本</a></nav>
+      <nav className={'main-nav' + (menuOpen ? ' open' : '')} aria-label="主导航"><a href="#map" aria-current={route.page === 'map' ? 'page' : undefined}>全球汇率</a><a href="#learn" aria-current={route.page === 'learn' ? 'page' : undefined}>课程读本</a><a href="#theory" aria-current={route.page === 'theory' ? 'page' : undefined}>理论深思</a></nav>
       <div className="header-actions"><button className="icon-button theme-toggle" aria-label={theme === 'dark' ? '切换为日间阅读' : '切换为夜间阅读'} title={theme === 'dark' ? '日间阅读' : '夜间阅读'} onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{theme === 'dark' ? <Sun size={19} /> : <Moon size={19} />}</button><button className="icon-button mobile-menu" aria-label={menuOpen ? '关闭导航' : '打开导航'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={21} /> : <Menu size={21} />}</button></div>
     </div></header>
     {mapVisited && <Suspense fallback={<main hidden={route.page !== 'map'} className="shell atlas-fallback"><h1>全球汇率</h1><div className="skeleton map-skeleton" role="status" aria-label="正在加载世界地图" /></main>}><WorldAtlas visible={route.page === 'map'} theme={theme} /></Suspense>}
     {route.page === 'learn' && (route.lesson ? <LessonReader lesson={route.lesson} key={route.lesson.id} /> : <CourseOverview />)}
+    {route.page === 'theory' && <Suspense fallback={<main className="shell theory-loading" id="main-content" aria-busy="true"><h1>理论深思</h1><p role="status">正在打开文章…</p></main>}><TheoryLibrary id={route.theoryId} /></Suspense>}
     <footer className="site-footer"><div className="shell"><div className="footer-sources"><a href="https://frankfurter.dev/" target="_blank" rel="noreferrer">Frankfurter</a><a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a><a href="https://github.com/mledoze/countries" target="_blank" rel="noreferrer">world-countries · ODbL</a><a href="https://maplibre.org/" target="_blank" rel="noreferrer">MapLibre</a></div></div></footer>
   </>
 }

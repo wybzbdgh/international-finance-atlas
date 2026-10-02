@@ -5,11 +5,12 @@ export type PlotSeries = { name: string; points: PlotPoint[]; color?: number; da
 export const plotColor = (index: number) => `var(--figure-${index % 6})`
 const number = (value: number) => Math.abs(value) >= 100 ? value.toFixed(0) : value.toFixed(1)
 
-export function FigurePlot({ title, series, xLabel, yLabel, xDomain, yDomain, xFormat = number, yFormat = number, marks = [], inspect = true }: {
+export function FigurePlot({ title, series, xLabel, yLabel, xDomain, yDomain, xFormat = number, yFormat = number, marks = [], inspect = true, cursorX, onCursorChange }: {
   title: string; series: PlotSeries[]; xLabel: string; yLabel: string;
   xDomain?: [number, number]; yDomain?: [number, number];
   xFormat?: (n: number) => string; yFormat?: (n: number) => string;
   marks?: { x: number; y: number; label: string }[]; inspect?: boolean;
+  cursorX?: number; onCursorChange?: (x: number) => void;
 }) {
   const root = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(560)
@@ -31,14 +32,15 @@ export function FigurePlot({ title, series, xLabel, yLabel, xDomain, yDomain, xF
   const height = 270, left = width < 370 ? 46 : 52, right = width - 15, top = 35, bottom = 216
   const px = (x: number) => left + (x - xLo) / (xHi - xLo || 1) * (right - left)
   const py = (y: number) => bottom - (y - yLo) / (yHi - yLo || 1) * (bottom - top)
-  const index = Math.min(cursor, series[0].points.length - 1)
+  const nearest = (points: PlotPoint[], x: number) => points.reduce((a, b) => Math.abs(a.x - x) < Math.abs(b.x - x) ? a : b)
+  const index = cursorX === undefined ? Math.min(cursor, series[0].points.length - 1) : series[0].points.indexOf(nearest(series[0].points, cursorX))
   const selected = series[0].points[index]
-  const nearest = (points: PlotPoint[], x: number) => points.reduce((a, b) => Math.abs(a.x - x) <= Math.abs(b.x - x) ? a : b)
+  const select = (next: number) => { setCursor(next); onCursorChange?.(series[0].points[next].x) }
   return <div className="figure-plot" ref={root}>
     <svg viewBox={`0 0 ${width} ${height}`} role={inspect ? 'group' : 'img'} aria-label={title + (inspect ? '；左右方向键查看读数' : '')} tabIndex={inspect ? 0 : undefined} aria-describedby={inspect ? id + '-readout' : undefined}
-      onKeyDown={event => { if (!inspect || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return; event.preventDefault(); setCursor(event.key === 'Home' ? 0 : event.key === 'End' ? series[0].points.length - 1 : Math.max(0, Math.min(series[0].points.length - 1, index + (event.key === 'ArrowRight' ? 1 : -1)))) }}
-      onPointerMove={event => { if (!inspect) return; const box = event.currentTarget.getBoundingClientRect(); const x = xLo + ((event.clientX - box.left) * width / box.width - left) / (right - left) * (xHi - xLo); setCursor(series[0].points.indexOf(nearest(series[0].points, x))) }}
-      onPointerDown={event => { if (inspect) { const box = event.currentTarget.getBoundingClientRect(); const x = xLo + ((event.clientX - box.left) * width / box.width - left) / (right - left) * (xHi - xLo); setCursor(series[0].points.indexOf(nearest(series[0].points, x))) } }}>
+      onKeyDown={event => { if (!inspect || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return; event.preventDefault(); select(event.key === 'Home' ? 0 : event.key === 'End' ? series[0].points.length - 1 : Math.max(0, Math.min(series[0].points.length - 1, index + (event.key === 'ArrowRight' ? 1 : -1)))) }}
+      onPointerMove={event => { if (!inspect) return; const box = event.currentTarget.getBoundingClientRect(); const x = xLo + ((event.clientX - box.left) * width / box.width - left) / (right - left) * (xHi - xLo); select(series[0].points.indexOf(nearest(series[0].points, x))) }}
+      onPointerDown={event => { if (inspect) { const box = event.currentTarget.getBoundingClientRect(); const x = xLo + ((event.clientX - box.left) * width / box.width - left) / (right - left) * (xHi - xLo); select(series[0].points.indexOf(nearest(series[0].points, x))) } }}>
       <title>{title}</title><defs><clipPath id={id + '-clip'}><rect x={left} y={top - 2} width={right - left} height={bottom - top + 4} /></clipPath></defs>
       <text className="figure-axis-title" x={left} y="16">{yLabel}</text>
       {[0, 1, 2, 3, 4].map(n => { const y = yLo + (yHi - yLo) * n / 4; return <g key={n}><line className="figure-grid" x1={left} y1={py(y)} x2={right} y2={py(y)} /><text x={left - 8} y={py(y) + 4} textAnchor="end">{yFormat(y)}</text></g> })}
@@ -50,7 +52,7 @@ export function FigurePlot({ title, series, xLabel, yLabel, xDomain, yDomain, xF
       {marks.map((mark, n) => <g key={mark.label}><circle cx={px(mark.x)} cy={py(mark.y)} r="4.5" className="figure-equilibrium" /><text className="figure-mark-label" x={Math.max(left + 15, Math.min(right - 15, px(mark.x)))} y={Math.max(top + 10, py(mark.y) + (n % 2 ? 19 : -12))} textAnchor="middle">{mark.label}</text></g>)}
     </svg>
     <div className="figure-legend">{series.map((s, n) => <span key={s.name}><i style={{ background: plotColor(s.color ?? n), opacity: s.dashed ? .65 : 1 }} />{s.name}</span>)}</div>
-    {inspect && <><div className="figure-readout" id={id + '-readout'} aria-live="polite"><strong>{xFormat(selected.x)}</strong>{series.map((s, n) => <span key={s.name}>{s.name}<b>{yFormat((n === 0 ? selected : nearest(s.points, selected.x)).y)}</b></span>)}</div><div className="figure-pointer-hint">点按曲线查看数值；也可聚焦图表后用方向键移动。</div></>}
+    {inspect && <><div className="figure-readout" id={id + '-readout'} aria-live="polite"><strong>{xFormat(selected.x)}</strong>{series.map((s, n) => <span key={s.name}>{s.name}<b>{yFormat((n === 0 ? selected : nearest(s.points, selected.x)).y)}</b></span>)}</div><div className="figure-pointer-hint">点按查看 · 方向键移动</div></>}
   </div>
 }
 

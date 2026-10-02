@@ -1,0 +1,60 @@
+/* Shared figure refinements: plots and values carry the explanation; methods
+   stay available without competing with the surrounding reading. */
+.reading-figure .figure-insight {
+  margin-top: 14px;
+  padding: 10px 0 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: transparent;
+}
+.reading-figure .figure-insight > p,
+.reading-figure .figure-outcome {
+  font: 400 13px/1.95 var(--font-sans);
+  color: var(--body);
+  margin: 8px 0 12px;
+}
+.reading-figure .figure-outcome strong { color: var(--text); font-weight: 550; font-variant-numeric: tabular-nums; }
+.reading-figure .figure-method { margin: 15px 0 0; border-top: 1px solid var(--line); font: 12px/1.8 var(--font-sans); color: var(--muted); }
+.reading-figure .figure-method > summary { cursor: pointer; padding: 11px 0; width: fit-content; }
+.reading-figure .figure-method > summary:hover { color: var(--text); }
+.reading-figure .figure-method > div { padding-bottom: 8px; }
+.reading-figure .figure-method p { margin: 6px 0 10px; font: 12px/1.9 var(--font-sans); color: var(--muted); overflow-wrap: anywhere; }
+.reading-figure .figure-readout { font-variant-numeric: tabular-nums; }
+.reading-figure .figure-readout > strong,
+.reading-figure .figure-readout b,
+.reading-figure .figure-bar-row strong { font-family: var(--font-sans); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.reading-figure .figure-pointer-hint { font-size: 11px; opacity: .8; margin-top: 5px; }
+.figure-waterfall { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 26px 0 20px; }
+.figure-waterfall > div { min-width: 0; text-align: center; }
+.figure-waterfall strong { display: block; margin-bottom: 12px; font: 500 13px/1.5 var(--font-sans); font-variant-numeric: tabular-nums; }
+.figure-waterfall-space { position: relative; display: block; height: 140px; }
+.figure-waterfall-bar { position: absolute; left: 12%; right: 12%; background: var(--accent); }
+.figure-waterfall-bar.loss { background: var(--figure-2); }
+.figure-waterfall-bar.total { background: var(--figure-1); }
+.figure-waterfall-zero { position: absolute; left: -5px; right: -5px; height: 1px; background: var(--line); }
+.figure-waterfall small { display: block; margin-top: 10px; font: 12px/1.6 var(--font-sans); color: var(--muted); word-break: normal; }
+.figure-equation-chain { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 22px 0; padding: 16px 0; border-block: 1px solid var(--line); }
+.figure-equation-chain > span { flex: 1; min-width: 0; text-align: center; font: 12px/1.7 var(--font-sans); color: var(--muted); }
+.figure-equation-chain b { display: block; margin-top: 8px; font: 500 20px/1.3 var(--font-sans); color: var(--text); font-variant-numeric: tabular-nums; }
+.figure-equation-chain > i { font: 14px var(--font-sans); color: var(--muted); }
+.figure-cashflow { display: grid; grid-template-columns: 1fr 20px 1fr; align-items: center; gap: 14px 10px; margin: 20px 0; padding: 15px 0; border-block: 1px solid var(--line); }
+.figure-cashflow > div { display: flex; flex-direction: column; gap: 7px; text-align: center; }
+.figure-cashflow span { font: 12px/1.6 var(--font-sans); color: var(--muted); }
+.figure-cashflow strong { font: 500 17px/1.4 var(--font-sans); font-variant-numeric: tabular-nums; }
+.figure-cashflow > i { font-style: normal; text-align: center; color: var(--muted); }
+.figure-linked-time { padding: 4px 0 12px; border-bottom: 1px solid var(--line); }
+.figure-network-static { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-block: 18px; }
+.figure-network-static > div { padding: 18px 15px; border-top: 1px solid var(--line); }
+.figure-network-static strong { font: 500 14px/1.8 var(--font-sans); color: var(--text); }
+.reading-figure .figure-network-static p { font: 12px/1.9 var(--font-sans); color: var(--muted); margin-top: 8px; }
+@media (max-width: 600px) {
+  .figure-waterfall { gap: 5px; }
+  .figure-waterfall strong { font-size: 12px; }
+  .figure-waterfall small { font-size: 11px; }
+  .figure-waterfall-space { height: 120px; }
+  .figure-equation-chain { gap: 6px; }
+  .figure-equation-chain b { font-size: 18px; }
+  .figure-equation-chain > span { font-size: 11px; }
+  .figure-network-static { grid-template-columns: 1fr; }
+  .figure-network-static > div { padding-inline: 0; }
+}

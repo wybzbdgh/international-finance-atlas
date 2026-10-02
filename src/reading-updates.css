@@ -1,0 +1,39 @@
+.rate-primary strong, .rate-secondary strong, .rate-change strong, .figure-readout, .figure-data td, .range-heading strong, .bridge-amount { font-family: var(--font-sans); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: 'zero' 0; }
+.rate-primary { column-gap: 10px; }
+.rate-primary strong { letter-spacing: -.015em; }
+.rate-primary small { font-size: 13px; line-height: 1; }
+.range-limits, .chart-labels, .chart-dates, .data-date { letter-spacing: 0; }
+.figure-plot svg text, .model-chart svg text { font-family: var(--font-sans); font-variant-numeric: tabular-nums; }
+.figure-insight { background: transparent; border: 0; padding: 0; }
+.reader-page.without-experiment { grid-template-columns: 180px minmax(0, 760px); column-gap: 70px; }
+.inline-experiment { margin: 28px 0 38px; }
+.inline-experiment .experiment-panel { max-height: none; overflow: visible; background: transparent; border-inline: 0; border-radius: 0; padding: 26px 0; }
+.inline-experiment .experiment-heading h2 { font: 600 20px/1.6 var(--font-serif); }
+.inline-experiment .experiment-panel .range-field { max-width: 620px; }
+.math-expression { color: var(--accent); overflow-x: auto; overflow-y: hidden; padding: 7px 2px 12px; scrollbar-width: thin; }
+.math-expression .katex-display { margin: 0; text-align: left; }
+.math-expression .katex-display > .katex { text-align: left; }
+.math-expression .katex { font-size: 1.1em; }
+.math-expression .katex .cjk_fallback { font-family: var(--font-sans); }
+.formula-expression { font-family: var(--font-sans); }
+.theory-term { color: var(--text); text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: .25em; }
+.theory-term:hover { color: var(--accent); }
+.theory-term > span[aria-hidden] { color: var(--accent); font-family: var(--font-sans); font-size: .65em; vertical-align: super; padding-left: 2px; }
+.lesson-theory-reading { margin: 45px 0; padding-top: 25px; border-top: 1px solid var(--line); }
+.lesson-theory-reading h2 { font-size: 25px; margin-bottom: 14px; }
+.lesson-theory-reading > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; }
+.lesson-theory-reading a { display: flex; gap: 12px; padding: 14px 0; align-items: baseline; font-size: 14px; }
+.lesson-theory-reading a:hover { color: var(--accent); }
+.lesson-theory-reading a time { font: 12px/1.7 var(--font-sans); color: var(--muted); min-width: 40px; }
+.lesson-theory-reading a span:nth-child(2) { flex: 1; }
+.lesson-theory-reading a small { display: block; color: var(--muted); font-size: 11px; margin-top: 4px; line-height: 1.75; }
+.theory-loading { padding-block: 60px; min-height: 65dvh; }
+.theory-loading h1 { font-size: 40px; margin-bottom: 30px; }
+@media(min-width: 1000px) { .reader-page.without-experiment .lesson-intro h1 { font-size: 38px; } }
+@media(max-width: 1100px) { .reader-page.without-experiment { grid-template-columns: 150px minmax(0, 1fr); column-gap: 42px; } }
+@media(max-width: 1023px) { .reader-page.without-experiment { grid-template-columns: minmax(0, 760px); grid-template-areas: 'nav' 'intro' 'body'; } .lesson-theory-reading > div { grid-template-columns: 1fr; } }
+@media(max-width: 600px) { .math-expression .katex { font-size: .95em; } .inline-experiment .experiment-panel { padding-inline: 0; } .lesson-theory-reading a { font-size: 13px; } .lesson-theory-reading a time { max-width: 68px; } }
+
+/* html supplies the shared 100px sticky-header offset. */
+main.reader-page [id], main.theory-reader [id], main.theory-directory [id] { scroll-margin-top: 8px; }
+main:focus { outline: none; }

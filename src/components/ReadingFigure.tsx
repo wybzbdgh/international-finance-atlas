@@ -1,14 +1,17 @@
 import { useState, type ReactNode } from 'react'
-import { figureTitles, weightMetrics, fxYears, fxShares, bigMac, equityShares, type FigureId } from '../figures-data'
+import { figureTitles, weightMetrics, fxYears, fxShares, bigMac, equityShares, cipsHistory, type FigureId } from '../figures-data'
 import { foreignReturn, policyEquilibrium, relativePppPath, riskSharing, sample, trancheLoss, uipSpot } from '../lib/figure-models'
-import { debtPath, exportHedge, overshootingPath } from '../lib/models'
+import { debtPath, exportHedge } from '../lib/models'
+import { moneyAdjustment } from '../lib/extended-figure-models'
 import { FigureBars, FigureData, FigurePlot } from './FigureCharts'
 import { Slider, Tabs, Reset } from './ExperimentUI'
+import { BalassaSamuelson, CipCashflow, CurrencyMismatch, IipValuation, IntertemporalChoice, JCurve, MoneyAdjustment, PolicyCapitalMobility, RepoLiquidity, SpecieFlow } from './ExtendedFigures'
+import '../figure-updates.css'
 
 const fixed = (n: number, digits = 2) => n.toFixed(digits)
 const signed = (n: number, digits = 1) => (n > 0 ? '+' : '') + n.toFixed(digits)
 const year = (n: number) => n.toFixed(0)
-function Note({ children }: { children: ReactNode }) { return <p className="figure-source">{children}</p> }
+function Note({ children }: { children: ReactNode }) { return <details className="figure-method"><summary>数据与口径</summary><div><p>{children}</p></div></details> }
 function Insight({ children }: { children: ReactNode }) { return <div className="figure-insight" aria-live="polite">{children}</div> }
 
 function CurrencyWeight() {
@@ -18,9 +21,8 @@ function CurrencyWeight() {
   return <><Tabs value={metric} onChange={setMetric} items={weightMetrics.map((m, n) => [String(n), m.label])} label="比较指标" />
     <div className="figure-period">{item.unit} · {item.year}</div>
     <FigureBars data={data} selected={selected} onSelect={setSelected} domain={[0, 65]} label={item.unit} />
-    <Insight><strong>{selected}：{data.find(d => d.name === selected)!.value.toFixed(1)}%</strong><p>{item.note}</p></Insight>
     <FigureData headers={['指标', '中国 / 人民币', '美国 / 美元', '欧元区 / 欧元']} rows={weightMetrics.map(m => [m.label, ...m.values.map(v => v.toFixed(1) + '%')])} />
-    <Note>沿用讲义图中标注值。GDP 与货物贸易：World Bank WDI；储备：IMF COFER；支付：Swift。各指标分母不同。</Note></>
+    <Note>{item.note} 沿用讲义图中标注值。GDP 与货物贸易：World Bank WDI；储备：IMF COFER；支付：Swift。各指标分母不同。</Note></>
 }
 
 function AccountBridge() {
@@ -47,12 +49,10 @@ function FxTurnover() {
 
 function BigMac() {
   const [selected, setSelected] = useState('中国'), [mode, setMode] = useState('gap')
-  const selectedValue = bigMac.find(d => d.name === selected)!.value
   const data = bigMac.map(d => ({ ...d, value: mode === 'gap' ? d.value : 100 + d.value }))
   return <><Tabs value={mode} onChange={setMode} items={ [['gap', '相对价差'], ['price', '美国价格 = 100']] } label="价格表示方式" />
     <div className="figure-period">2026 年 1 月 · 按市场汇率折算</div>
     <FigureBars data={data} selected={selected} onSelect={setSelected} domain={mode === 'gap' ? [-65, 55] : [0, 155]} format={n => mode === 'gap' ? signed(n, 0) + '%' : fixed(n, 0)} label="各地巨无霸价格" />
-    <Insight><strong>{selected}的汉堡价格比美国{selectedValue < 0 ? '低' : '高'}约 {Math.abs(selectedValue)}%</strong><p>汉堡不能跨境转售，而且售价包含当地人工、店面租金和税费。这些成本不能通过进口汉堡来拉平。</p></Insight>
     <Note>The Economist 开源数据，沿用讲义图中四舍五入至整数的价差。价格指数由这些约数换算，不是对汇率应当升贬多少的预测。</Note></>
 }
 
@@ -75,16 +75,16 @@ function UipFigure() {
 }
 
 function Overshooting() {
-  const [shock, setShock] = useState(10), [speed, setSpeed] = useState(.4), [duration, setDuration] = useState('permanent')
-  const result = overshootingPath(7, shock / 100, speed)
-  const terminal = duration === 'permanent' ? result.longRun : 7
-  const impact = duration === 'permanent' ? result.impact : 7 * (1 + shock / 100)
-  const points = [{ x: -1, y: 7 }, { x: 0, y: 7 }, ...sample(0, 12, x => terminal + (impact - terminal) * Math.exp(-speed * x), 49)]
-  return <><Tabs value={duration} onChange={setDuration} items={[['temporary', '临时扩张'], ['permanent', '永久扩张']]} label="货币扩张的持续性" />
-    <FigurePlot title="货币扩张后的汇率调整" series={[{ name: '即期汇率', points }, { name: '长期水平', points: sample(-1, 12, () => terminal), color: 1, dashed: true }]} xDomain={[-1, 12]} xLabel="调整期（0 为冲击时点）" yLabel="汇率 E（本币 / 外币）" xFormat={n => n < 0 ? '冲击前' : fixed(n, 0)} />
-    <div className="figure-controls"><Slider label="货币扩张幅度" amount={shock} min={0} max={20} unit="%" onChange={setShock} /><Slider label="价格调整速度" amount={speed} min={.1} max={1} step={.1} onChange={setSpeed} /></div>
-    <Insight><strong>冲击时 {fixed(impact)} → 长期 {fixed(terminal)}</strong><p>{duration === 'permanent' ? '永久扩张改变长期汇率。即期汇率的即时反应超过长期变动幅度，随后部分回落，称为超调。' : '临时扩张不改变长期货币供给；宽松退出后，汇率回到原来的长期水平。'}</p></Insight>
-    <Reset onClick={() => { setShock(10); setSpeed(.4); setDuration('permanent') }} /><Note>根据讲义临时与永久货币扩张图绘制的简化路径。即时反应与收敛速度为教学设定，未对现实经济估计。</Note></>
+  const [shock, setShock] = useState(10), [speed, setSpeed] = useState(.6), [mode, setMode] = useState('sticky')
+  const flexible = mode === 'flexible'
+  const terminal = 7 * (1 + shock / 100)
+  const impact = moneyAdjustment(shock, speed, 2, 0, flexible).exchange
+  const points = [{ x: -1, y: 7 }, { x: 0, y: 7 }, ...sample(0, 12, x => moneyAdjustment(shock, speed, 2, x, flexible).exchange, 49)]
+  return <><Tabs value={mode} onChange={setMode} items={[['sticky', '价格逐步调整'], ['flexible', '价格立即调整']]} label="价格调整方式" />
+    <FigurePlot title="永久货币扩张后的汇率调整" series={[{ name: '即期汇率', points }, { name: '长期水平', points: sample(-1, 12, () => terminal), color: 1, dashed: true }, { name: '冲击前水平', points: sample(-1, 12, () => 7), color: 4, dashed: true }]} xDomain={[-1, 12]} xLabel="年数（0 为冲击时点）" yLabel="汇率 E（本币 / 外币）" xFormat={n => n < 0 ? '冲击前' : fixed(n, 0)} />
+    <div className="figure-controls"><Slider label="永久货币扩张幅度" amount={shock} min={0} max={20} unit="%" onChange={setShock} />{!flexible && <Slider label="价格调整速度 θ" amount={speed} min={.2} max={1.2} step={.1} onChange={setSpeed} />}</div>
+    <Insight><strong>冲击时 {fixed(impact, 3)} → 长期 {fixed(terminal, 3)}</strong><p>{flexible ? '物价立即调整时，汇率直接达到长期水平。' : '物价逐步调整时，即期汇率先超过长期水平，随后回落。提高价格调整速度，可比较超调幅度的变化。'}</p></Insight>
+    <Reset onClick={() => { setShock(10); setSpeed(.6); setMode('sticky') }} /><Note>简化联动模型：价格按 dp/dt = θ(m−p) 调整，货币需求满足 m−p = −λ(i−i*)，UIP 要求 de/dt = i−i*。m、p、e 为相对初始水平的对数变化，λ 取 2；长期 e=p=m。稳定路径 e=m+[m/(λθ)]exp(−θt)，即时反应由方程决定。产出和外国利率不变，参数为教学设定。</Note></>
 }
 
 function PolicyMarkets() {
@@ -143,10 +143,8 @@ function DebtFigure() {
 
 function EquityMarkets() {
   const [selected, setSelected] = useState('中国内地'), [mode, setMode] = useState('share')
-  const original = equityShares.find(d => d.name === selected)!
   return <><Tabs value={mode} onChange={setMode} items={[['share', '全球份额'], ['amount', '市值金额']]} label="市值表示方式" /><div className="figure-period">2024 年末 · 全球股票市值 126.7 万亿美元</div>
     <FigureBars data={equityShares.map(d => ({ ...d, value: mode === 'share' ? d.value : 126.7 * d.value / 100 }))} selected={selected} onSelect={setSelected} format={n => fixed(n, 1) + (mode === 'share' ? '%' : '')} label={mode === 'share' ? '全球股票市值份额' : '市值，万亿美元'} />
-    <Insight><strong>{selected}：{original.value}% · 约 {fixed(126.7 * original.value / 100, 2)} 万亿美元</strong><p>市值同时受上市公司数量、盈利能力和估值影响。股市份额与 GDP 份额衡量的不是同一对象。</p></Insight>
     <Note>SIFMA《2025 年资本市场概况》，沿用讲义图中份额。金额按已四舍五入的份额换算，属于约数；各项份额可能因舍入略有误差。</Note></>
 }
 
@@ -164,16 +162,14 @@ function HedgeFigure() {
 }
 
 function DollarNetwork() {
-  const [active, setActive] = useState(0)
   const nodes = [
-    ['贸易计价', '美元计价增加支付、融资和风险管理需求。'],
-    ['银行与融资市场', '银行、债券市场与外汇掉期扩大美元供给。'],
-    ['美元资产需求', '美元资产需求又支持市场深度和抵押品功能。'],
-    ['流动性与使用成本', '市场越深，后来者使用美元的交易和套保成本越低；使用者越多，金融机构越愿意继续提供美元工具。'],
+    ['贸易计价 → 融资需求', '美元计价增加支付、融资和风险管理需求。'],
+    ['融资市场 → 资产供给', '银行、债券市场与外汇掉期扩大美元融资及金融工具的供给。'],
+    ['资产需求 → 市场深度', '美元资产需求支持市场深度和抵押品功能。'],
+    ['市场深度 → 货币使用', '市场越深，交易和套保成本越低；使用者越多，金融机构越愿意继续提供美元工具。'],
   ]
-  return <><div className="dollar-feedback" role="group" aria-label="美元网络的相互强化关系">{nodes.map(([name], i) => <button key={name} aria-pressed={active === i} className={active === i ? 'selected' : ''} onClick={() => setActive(i)}><span>{name}</span><b aria-hidden="true">{i === 0 ? '→' : i === 1 ? '↓' : i === 2 ? '←' : '↑'}</b></button>)}</div>
-    <Insight><strong>{nodes[active][0]}</strong><p>{nodes[active][1]}</p></Insight>
-    <Note>依据讲义美元网络反馈图。它是多类选择相互强化的机制图，不表示每笔交易都依次经过全部环节。</Note></>
+  return <><div className="figure-network-static" aria-label="美元使用的相互强化关系">{nodes.map(([title, text]) => <div key={title}><strong>{title}</strong><p>{text}</p></div>)}</div>
+    <Note>依据讲义美元网络反馈图。各环节相互影响；它不是逐笔交易必须经过的顺序。</Note></>
 }
 
 function PaymentRoute() {
@@ -188,13 +184,17 @@ function PaymentRoute() {
 }
 
 function CipsGrowth() {
-  const [metric, setMetric] = useState('amount'), [selected, setSelected] = useState('2025 年')
-  const values = metric === 'amount' ? [.4809, 180.15] : [.0867, 8.442]
-  const data = ['2015 年', '2025 年'].map((name, n) => ({ name, value: values[n] }))
-  return <><Tabs value={metric} onChange={setMetric} items={[['amount', '处理金额'], ['count', '业务笔数']]} label="CIPS 业务指标" /><div className="figure-period">{metric === 'amount' ? '单位：万亿元' : '单位：百万笔'} · 比较启用年份与 2025 年</div>
-    <FigureBars data={data} selected={selected} onSelect={setSelected} format={n => fixed(n, 4)} label="CIPS 业务规模" />
-    <Insight><strong>{selected}：{data.find(d => d.name === selected)!.value} {metric === 'amount' ? '万亿元' : '百万笔'}</strong><p>2025 年约为启用年份的 {fixed(values[1] / values[0], 0)} 倍。两项指标反映系统处理活动，不代表人民币全球支付份额。</p></Insight>
-    <Note>跨境银行间支付清算有限责任公司历年业务统计。仅比较讲义正文明确列出的两个年份：2015 年为启用当年的部分年度，金额和笔数均已统一单位。</Note></>
+  const [metric, setMetric] = useState('amount'), [mode, setMode] = useState('level'), [start, setStart] = useState(2015), [end, setEnd] = useState(2025)
+  const value = (item: typeof cipsHistory[number]) => metric === 'amount' ? item.amountBillion / 1000 : item.transactions / 1e6
+  const allPoints = cipsHistory.map((item, index) => ({ x: item.year, y: mode === 'level' ? value(item) : index ? (value(item) / value(cipsHistory[index - 1]) - 1) * 100 : 0 })).filter(point => mode === 'level' || point.x >= 2017)
+  const points = allPoints.filter(point => point.x >= start && point.x <= end)
+  const unit = mode === 'growth' ? '同比增长（%）' : metric === 'amount' ? '处理金额（万亿元）' : '业务笔数（百万笔）'
+  return <><Tabs value={metric} onChange={setMetric} items={[['amount', '处理金额'], ['count', '业务笔数']]} label="CIPS 业务指标" /><Tabs value={mode} onChange={next => { setMode(next); if (next === 'growth') { setStart(Math.max(start, 2017)); setEnd(Math.max(end, 2018)) } }} items={[['level', '年度规模'], ['growth', '同比变化']]} label="年度规模或增速" />
+    <FigurePlot title="CIPS 历年业务" series={[{ name: metric === 'amount' ? '处理金额' : '业务笔数', points }]} xLabel="年份" yLabel={unit} xFormat={year} yFormat={value => value.toFixed(mode === 'growth' ? 1 : metric === 'amount' ? 2 : 3) + (mode === 'growth' ? '%' : '')} />
+    <div className="figure-controls"><Slider label="起始年份" amount={start} min={mode === 'growth' ? 2017 : 2015} max={2024} onChange={value => { setStart(value); setEnd(Math.max(end, value + 1)) }} /><Slider label="结束年份" amount={end} min={start + 1} max={2025} onChange={setEnd} /></div>
+    <Reset onClick={() => { setMetric('amount'); setMode('level'); setStart(2015); setEnd(2025) }} />
+    <FigureData headers={['年份', '处理金额（万亿元）', '业务笔数（笔）']} rows={cipsHistory.map(item => [item.year, (item.amountBillion / 1000).toFixed(4), item.transactions.toLocaleString('zh-CN')])} />
+    <Note><a href="https://www.cips.com.cn/kjjqgsyyingw/articleFileDir/2025-12/10/7776329b413141ea94e6e5588d8d048c.pdf" target="_blank" rel="noreferrer">CIPS 官方历年业务统计</a>，2015—2025 年。原表金额单位为十亿元，本站换算为万亿元；笔数曲线以百万笔显示。2015 年是系统启用后的部分年度，因此同比图从 2017 年起显示，避免将 2016 年与部分年度直接比较。曲线连接年度观测，不表示年内走势；处理活动不等于人民币全球支付份额。</Note></>
 }
 
 function ReserveGold() {
@@ -205,7 +205,6 @@ function ReserveGold() {
   return <><Tabs value={view} onChange={v => { setView(v); setSelected(v === 'gold' ? '2024 年' : '2026 Q1') }} items={[['gold', '央行净购金'], ['dollar', '美元储备份额']]} label="储备分散化的观察口径" />
     <div className="figure-period">{view === 'gold' ? '年度净购金流量 · 吨' : '官方外汇储备的币种份额 · %'}</div>
     <FigureBars data={data} selected={selected} onSelect={setSelected} format={n => fixed(n, view === 'gold' ? 0 : 1) + (view === 'gold' ? ' 吨' : '%')} label={view === 'gold' ? '各年央行净购金' : '两个时点的美元储备份额'} />
-    <Insight><strong>{selected}：{data.find(d => d.name === selected)!.value}{view === 'gold' ? ' 吨' : '%'}</strong><p>{view === 'gold' ? '这里是央行年度净购金流量，不是黄金储备存量，也不是黄金在总储备中的占比。' : '美元份额下降 13.7 个百分点。COFER 的分母为全球官方外汇储备，不含黄金。'}</p></Insight>
     <Note>IMF COFER、世界黄金协会，沿用讲义标注值。美元面板仅比较讲义正文列出的起止季度；COFER 采用同一修订口径。两种指标不能相加。</Note></>
 }
 
@@ -215,6 +214,10 @@ const components: Record<FigureId, () => ReactNode> = {
   'policy-markets': PolicyMarkets, 'risk-sharing': SharingFigure, securitization: Securitization,
   'debt-dynamics': DebtFigure, 'equity-markets': EquityMarkets, 'hedge-payoff': HedgeFigure,
   'dollar-network': DollarNetwork, 'payment-route': PaymentRoute, 'cips-growth': CipsGrowth, 'reserve-gold': ReserveGold,
+  'iip-valuation': IipValuation, 'balassa-samuelson': BalassaSamuelson, 'cip-cashflow': CipCashflow,
+  'j-curve': JCurve, 'currency-mismatch': CurrencyMismatch, 'repo-liquidity': RepoLiquidity,
+  'policy-capital-mobility': PolicyCapitalMobility, 'money-adjustment': MoneyAdjustment,
+  'specie-flow': SpecieFlow, 'intertemporal-choice': IntertemporalChoice,
 }
 export default function ReadingFigure({ kind }: { kind: FigureId }) {
   const Component = components[kind]

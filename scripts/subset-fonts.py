@@ -11,8 +11,8 @@ from fontTools.ttLib import TTFont
 
 ROOT = Path(__file__).resolve().parents[1]
 font_paths = [Path(arg) for arg in sys.argv[1:]]
-if len(font_paths) != 2:
-    raise SystemExit('Usage: subset-fonts.py SourceHanSerifCN-Regular.otf SourceHanSerifCN-SemiBold.otf')
+if len(font_paths) not in (2, 4):
+    raise SystemExit('Usage: subset-fonts.py SourceHanSerifCN-Regular.otf SourceHanSerifCN-SemiBold.otf [SourceHanSansCN-Regular.otf SourceHanSansCN-Medium.otf]')
 destination = ROOT / 'src/assets/fonts'
 destination.mkdir(parents=True, exist_ok=True)
 
@@ -21,7 +21,7 @@ text += (ROOT / 'public/data/countries.json').read_text()
 text += ''.join(chr(i) for i in range(32, 127))
 text += '−–—×÷≈≠≤≥∗πρ∆¥￥€£→←↑↓＋％［］（）【】《》“”‘’：；！？、。·'
 
-for font_path, style in zip(font_paths, ['Regular', 'Semibold']):
+for font_path, style, family in zip(font_paths, ['Regular', 'Semibold', 'Regular', 'Medium'], ['Serif', 'Serif', 'Sans', 'Sans']):
     instance = TTFont(font_path)
     options = subset.Options()
     options.layout_features = ['*']
@@ -34,11 +34,11 @@ for font_path, style in zip(font_paths, ['Regular', 'Semibold']):
         raise SystemExit('Missing CJK glyphs: ' + ''.join(sorted(missing_cjk)))
     # The subset is a derivative; use a new internal family name.
     names = {
-        1: 'Huiliu Serif SC', 2: style,
-        3: f'Huiliu Serif SC 2.003 {style}',
-        4: f'Huiliu Serif SC {style}',
-        6: f'HuiliuSerifSC-{style}',
-        16: 'Huiliu Serif SC', 17: style,
+        1: f'Huiliu {family} SC', 2: style,
+        3: f'Huiliu {family} SC {style}',
+        4: f'Huiliu {family} SC {style}',
+        6: f'Huiliu{family}SC-{style}',
+        16: f'Huiliu {family} SC', 17: style,
     }
     for record in instance['name'].names:
         if record.nameID in names:
@@ -52,6 +52,6 @@ for font_path, style in zip(font_paths, ['Regular', 'Semibold']):
         if hasattr(top, 'FontName'):
             top.FontName = names[6]
     instance.flavor = 'woff2'
-    target = destination / f'huiliu-serif-sc-{style.lower()}.woff2'
+    target = destination / f'huiliu-{family.lower()}-sc-{style.lower()}.woff2'
     instance.save(target)
     print(f'{target.name}: {target.stat().st_size:,} bytes; {len(covered)} glyphs')
