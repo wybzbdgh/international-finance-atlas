@@ -3,17 +3,21 @@ import maplibregl, { type Map as MapLibreMap } from 'maplibre-gl'
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Globe2, Maximize2, RotateCcw, Search, X } from 'lucide-react'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { lessonHref, type LessonId } from '../content'
+import { crossRate, pairChange, sortHistory, type Rate } from '../lib/fx'
 
-type Rate = { date: string; base: string; quote: string; rate: number }
 type Country = { id: number; iso: string; name: string; nameEn: string; currency: string | null; continent: string; labelX: number; labelY: number }
 type CountryFeature = { type: 'Feature'; id: number; properties: Omit<Country, 'id'>; geometry: GeoJSON.Geometry }
 type CountryData = { type: 'FeatureCollection'; features: CountryFeature[] }
 const API = 'https://api.frankfurter.dev/v2/rates'
 const dateBefore = (days: number) => new Date(Date.now() - days * 86400000).toISOString().slice(0, 10)
-const fmt = (n: number, max = 4) => new Intl.NumberFormat('zh-CN', { maximumFractionDigits: max, minimumFractionDigits: n < 10 ? 2 : 0 }).format(n)
+const fmt = (n: number) => new Intl.NumberFormat('zh-CN', { maximumFractionDigits: n < 0.01 ? 8 : n < 1 ? 6 : 4, minimumFractionDigits: n < 10 ? 2 : 0 }).format(n)
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const commonNames: Record<string, string> = { CHN: '中国', USA: '美国', GBR: '英国', DEU: '德国', RUS: '俄罗斯', KOR: '韩国', PRK: '朝鲜', VNM: '越南', IRN: '伊朗', LAO: '老挝' }
-const quickCountries = [{ iso: 'CHN', name: '中国' }, { iso: 'USA', name: '美国' }, { iso: 'JPN', name: '日本' }, { iso: 'GBR', name: '英国' }, { iso: 'DEU', name: '德国' }, { iso: 'THA', name: '泰国' }]
+const quoteCurrencies = [
+  { code: 'CNY', name: '人民币' }, { code: 'USD', name: '美元' }, { code: 'JPY', name: '日元' },
+  { code: 'EUR', name: '欧元' }, { code: 'GBP', name: '英镑' }, { code: 'CHF', name: '瑞士法郎' }
+]
+const currencyName = (code: string) => quoteCurrencies.find(item => item.code === code)?.name || code
 const relatedReadings: Record<string, { id: LessonId; title: string; section?: 'cases' }[]> = {
   CHN: [{ id: 'regimes', title: '人民币汇率改革与在岸、离岸市场' }, { id: 'renminbi', title: '人民币的境外使用与国际化' }],
   USA: [{ id: 'dollar', title: '美元体系与全球金融周期' }, { id: 'crisis', title: '2008 年全球金融危机' }],
@@ -46,18 +50,18 @@ async function getRates(query: string, signal: AbortSignal): Promise<Rate[]> {
   const response = await fetch(API + query, { signal })
   if (!response.ok) throw new Error('汇率服务暂不可用')
   const data: unknown = await response.json()
-  if (!Array.isArray(data) || !data.every(row => typeof row?.quote === 'string' && typeof row?.date === 'string' && typeof row?.rate === 'number' && row.rate > 0)) throw new Error('无效的汇率数据')
+  if (!Array.isArray(data) || !data.every(row => typeof row?.base === 'string' && typeof row?.quote === 'string' && typeof row?.date === 'string' && typeof row?.rate === 'number' && Number.isFinite(row.rate) && row.rate > 0)) throw new Error('无效的汇率数据')
   return data as Rate[]
 }
 
-function LineChart({ rows, currency }: { rows: Rate[]; currency: string }) {
+function LineChart({ rows, base, quote }: { rows: Rate[]; base: string; quote: string }) {
   if (rows.length < 2) return <p className="chart-message">暂无足够的历史数据。</p>
   const values = rows.map(r => r.rate)
   const min = Math.min(...values), max = Math.max(...values), gap = max - min || 1
   const start = Date.parse(rows[0].date), end = Date.parse(rows.at(-1)!.date)
   const points = rows.map(r => (12 + (Date.parse(r.date) - start) / (end - start) * 376) + ',' + (96 - (r.rate - min) / gap * 78)).join(' ')
-  return <div className="chart-wrap" role="img" aria-label={'过去90天，1美元兑换的' + currency + '从' + fmt(values[0]) + '变为' + fmt(values.at(-1)!)}>
-    <div className="chart-labels"><span>{fmt(max)}</span><span>1 USD / {currency}</span></div>
+  return <div className="chart-wrap" role="img" aria-label={'过去90天，1 ' + base + '兑换的' + quote + '从' + fmt(values[0]) + '变为' + fmt(values.at(-1)!)}>
+    <div className="chart-labels"><span>{fmt(max)}</span><span>{quote} / {base}</span></div>
     <svg viewBox="0 0 400 114" preserveAspectRatio="none" aria-hidden="true">
       {[18, 57, 96].map(y => <line key={y} x1="12" x2="388" y1={y} y2={y} className="chart-grid" />)}
       <polyline points={points} fill="none" className="chart-line" vectorEffect="non-scaling-stroke" />
@@ -72,6 +76,7 @@ export default function WorldAtlas({ theme, visible }: { theme: 'dark' | 'light'
   const mapRef = useRef<MapLibreMap | null>(null)
   const [countries, setCountries] = useState<Country[]>([])
   const [selected, setSelected] = useState<Country | null>(null)
+  const [quote, setQuote] = useState('USD')
   const [view, setView] = useState<'globe' | 'flat'>('globe')
   const [changeMode, setChangeMode] = useState(false)
   const [mapState, setMapState] = useState<'loading' | 'ready' | 'error'>('loading')
@@ -92,10 +97,12 @@ export default function WorldAtlas({ theme, visible }: { theme: 'dark' | 'light'
   }
   const current = useMemo(() => ({ USD: 1, ...Object.fromEntries(latest.map(r => [r.quote, r.rate])) }) as Record<string, number>, [latest])
   const old = useMemo(() => ({ USD: 1, ...Object.fromEntries(previous.map(r => [r.quote, r.rate])) }) as Record<string, number>, [previous])
-  const selectedRate = selected?.currency ? current[selected.currency] : undefined
-  const delta = selected?.currency && selectedRate && old[selected.currency] ? (selectedRate / old[selected.currency] - 1) * 100 : undefined
-  const filtered = countries.filter(c => (c.name + ' ' + c.nameEn + ' ' + c.iso + ' ' + (c.currency || '')).toLowerCase().includes(query.toLowerCase())).slice(0, 8)
-  const date = latest[0]?.date
+  const base = selected?.currency
+  const selectedRate = base ? crossRate(current, base, quote) : undefined
+  const delta = base ? pairChange(current, old, base, quote) : undefined
+  const referenceDates = [base, quote].filter(code => code !== 'USD').map(code => latest.find(row => row.quote === code)?.date).filter(Boolean) as string[]
+  const date = referenceDates.length ? Array.from(new Set(referenceDates)).sort().join(' / ') : latest[0]?.date
+  const filtered = countries.filter(c => (c.name + ' ' + (commonNames[c.iso] || '') + ' ' + c.nameEn + ' ' + c.iso + ' ' + (c.currency || '')).toLowerCase().includes(query.trim().toLowerCase())).slice(0, 8)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -209,33 +216,32 @@ export default function WorldAtlas({ theme, visible }: { theme: 'dark' | 'light'
       map.setPaintProperty('country-hover', 'fill-color', p.hover)
       if (changeMode && previous.length) {
         for (const country of countries) {
-          const a = country.currency ? current[country.currency] : undefined
-          const b = country.currency ? old[country.currency] : undefined
-          map.setFeatureState({ source: 'countries', id: country.id }, { change: a && b ? (a / b - 1) * 100 : null })
+          const change = country.currency ? pairChange(current, old, country.currency, quote) : undefined
+          map.setFeatureState({ source: 'countries', id: country.id }, { change: change ?? null })
         }
         map.setPaintProperty('countries-fill', 'fill-color', ['case',
           ['==', ['feature-state', 'change'], null], p.land,
-          ['>', ['feature-state', 'change'], 0.5], p.up,
-          ['<', ['feature-state', 'change'], -0.5], p.down, p.flat
+          ['>', ['feature-state', 'change'], 0.5], p.down,
+          ['<', ['feature-state', 'change'], -0.5], p.up, p.flat
         ])
       } else map.setPaintProperty('countries-fill', 'fill-color', p.land)
     }
     if (map.isStyleLoaded()) apply(); else map.once('load', apply)
     return () => { map.off('load', apply) }
-  }, [theme, mapState, changeMode, countries, current, old, previous.length])
+  }, [theme, mapState, changeMode, countries, current, old, previous.length, quote])
 
   useEffect(() => {
-    if (!selected?.currency || !current[selected.currency] || selected.currency === 'USD') { setHistory([]); setHistoryState('ready'); return }
+    if (!base || selectedRate === undefined || base === quote) { setHistory([]); setHistoryState('ready'); return }
     const controller = new AbortController()
     let alive = true
     const timeout = window.setTimeout(() => controller.abort(), 20000)
     setHistoryState('loading')
     setHistory([])
-    getRates('?from=' + dateBefore(90) + '&to=' + new Date().toISOString().slice(0, 10) + '&base=USD&quotes=' + selected.currency, controller.signal)
-      .then(rows => { if (alive) { setHistory(rows); setHistoryState('ready') } })
+    getRates('?from=' + dateBefore(90) + '&to=' + new Date().toISOString().slice(0, 10) + '&base=' + base + '&quotes=' + quote, controller.signal)
+      .then(rows => { if (alive) { setHistory(sortHistory(rows, base, quote)); setHistoryState('ready') } })
       .catch(() => { if (alive) setHistoryState('error') })
     return () => { alive = false; clearTimeout(timeout); controller.abort() }
-  }, [selected?.currency, current, historyRetry])
+  }, [base, quote, selectedRate, historyRetry])
 
   const choose = (country: Country) => { setSelected(country); setQuery(''); setSearchOpen(false); setSearchIndex(-1) }
   const resetMap = () => mapRef.current?.easeTo({ center: [104, 25], zoom: view === 'globe' ? globeZoom() : window.innerWidth < 768 ? 0.35 : 0.8, duration: reducedMotion() ? 0 : 800 })
@@ -245,7 +251,7 @@ export default function WorldAtlas({ theme, visible }: { theme: 'dark' | 'light'
     <div className="atlas-hero">
       <section className="atlas-intro">
         <h1>世界货币<br /><span>汇率地图</span></h1>
-        <p>选择国家，查看本币对美元、人民币的每日参考汇率。</p>
+        <p>先选国家，再选币种，查看本币能兑换多少人民币、美元或日元。</p>
         <a href="#learn" className="primary-button">课程读本<ArrowRight size={18} /></a>
       </section>
       <div className="map-stage">
@@ -257,7 +263,7 @@ export default function WorldAtlas({ theme, visible }: { theme: 'dark' | 'light'
         <div className="map-viewport" ref={mapEl} role="region" aria-label="交互世界地图，可拖动旋转。也可以使用旁边的国家搜索。" />
         {mapState === 'loading' && <div className="map-loading" role="status"><div className="skeleton globe-skeleton" /><span>正在加载地图</span></div>}
         {mapState === 'error' && <div className="map-error" role="status"><Globe2 size={34} /><p>地图暂时无法显示。</p><button className="secondary-button" onClick={() => setMapRetry(n => n + 1)}>重新加载地图</button><small>{countries.length ? '仍可使用国家搜索查看汇率。' : '重新连接后可继续选择国家。'}</small></div>}
-        {changeMode && <div className="map-legend"><span><i className="appreciation" />本币升值</span><span><i className="stable" />小幅变化</span><span><i className="depreciation" />本币贬值</span><span><i className="no-rate" />无报价</span>{!previous.length && <small>暂未取得对比日数据</small>}</div>}
+        {changeMode && <div className="map-legend"><small>相对{currencyName(quote)} · 近 30 日</small><span><i className="appreciation" />本币升值</span><span><i className="stable" />小幅变化</span><span><i className="depreciation" />本币贬值</span><span><i className="no-rate" />无报价</span>{!previous.length && <small>暂未取得对比日数据</small>}</div>}
         <div className="map-instruction">拖动旋转 · 使用 ＋ / − 缩放</div>
       </div>
       <aside className="country-panel">
@@ -274,21 +280,21 @@ export default function WorldAtlas({ theme, visible }: { theme: 'dark' | 'light'
               if (e.key === 'Enter' && query && filtered.length) { e.preventDefault(); choose(filtered[Math.max(searchIndex, 0)]) }
             }} />
           {query && <button aria-label="清除搜索" onClick={() => { setQuery(''); setSearchOpen(false) }}><X size={15} /></button>}
-          {searchOpen && query && <div className="search-results" id="country-results" role="listbox">{filtered.length ? filtered.map((country, i) => <button id={'country-result-' + i} role="option" aria-selected={i === searchIndex} className={i === searchIndex ? 'highlighted' : ''} onMouseDown={e => e.preventDefault()} key={country.id} onClick={() => choose(country)}><span>{country.name}</span><small>{country.currency || '未匹配币种'}</small></button>) : <p>未找到对应国家或货币。</p>}</div>}
+          {searchOpen && query && <div className="search-results" id="country-results" role="listbox">{filtered.length ? filtered.map((country, i) => <button id={'country-result-' + i} role="option" aria-selected={i === searchIndex} className={i === searchIndex ? 'highlighted' : ''} onMouseDown={e => e.preventDefault()} key={country.id} onClick={() => choose(country)}><span>{commonNames[country.iso] || country.name}</span><small>{country.currency || '未匹配币种'}</small></button>) : <p>未找到对应国家或货币。</p>}</div>}
         </div>
         <div className="country-name" aria-live="polite"><div><span>{selected?.nameEn || 'Select a country'}</span><h2 title={selected?.name} className={(selected?.name.length || 0) > 8 && !commonNames[selected?.iso || ''] ? 'long-country-name' : ''}>{selected ? commonNames[selected.iso] || selected.name : '选择一个国家'}</h2></div><span className="currency-code">{selected?.currency || '暂无币种'}</span></div>
-        {rateState === 'loading' ? <div className="rate-loading" role="status"><span className="skeleton skeleton-number" /><span className="skeleton skeleton-text" /><p>正在取得参考汇率</p></div> : rateState === 'error' ? <div className="rate-empty"><p>汇率服务暂时无法连接。</p><button className="text-button" onClick={() => setRetry(n => n + 1)}>重新获取<RotateCcw size={14} /></button></div> : selectedRate ? <>
-          <div className="rate-primary" aria-live="polite"><span>1 美元可兑换</span><strong>{fmt(selectedRate, selectedRate < 1 ? 5 : 4)}</strong><small>{selected?.currency}</small></div>
-          <div className="rate-secondary"><span>1 {selected?.currency} 折合人民币</span><strong>{current.CNY ? fmt(current.CNY / selectedRate) + ' 元' : '暂无报价'}</strong></div>
-          <div className="rate-change"><span>兑美元 · 近 30 日</span><strong className={delta === undefined || Math.abs(delta) < 0.005 ? '' : delta > 0 ? 'depreciation-text' : 'appreciation-text'}>{delta === undefined ? '暂无对比' : (delta > 0 ? '+' : '') + delta.toFixed(2) + '%'}{delta !== undefined && delta !== 0 && (delta > 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />)}</strong></div>
-          <div className="chart-heading"><span>过去 90 天</span><span>1 USD / {selected?.currency}</span></div>
-          {selected?.currency === 'USD' ? <p className="chart-message">美元是计价基准。选择其他国家查看变化。</p> : historyState === 'loading' ? <div className="chart-message skeleton" aria-label="正在加载历史走势" /> : historyState === 'error' ? <div className="chart-message">历史数据暂不可用。<button className="text-button" onClick={() => setHistoryRetry(n => n + 1)}>重试</button></div> : <LineChart rows={history} currency={selected?.currency || ''} />}
+        {rateState === 'loading' ? <div className="rate-loading" role="status"><span className="skeleton skeleton-number" /><span className="skeleton skeleton-text" /><p>正在取得参考汇率</p></div> : rateState === 'error' ? <div className="rate-empty"><p>汇率服务暂时无法连接。</p><button className="text-button" onClick={() => setRetry(n => n + 1)}>重新获取<RotateCcw size={14} /></button></div> : selectedRate !== undefined ? <>
+          <div className="rate-primary" aria-live="polite"><span>1 {currencyName(base!)} 可兑换</span><strong>{fmt(selectedRate)}</strong><small>{quote}</small></div>
+          <div className="rate-secondary"><span>反向报价 · 1 {quote}</span><strong>{fmt(1 / selectedRate)} {base}</strong></div>
+          <div className="rate-change"><span>兑{currencyName(quote)} · 近 30 日</span><strong className={delta === undefined || Math.abs(delta) < 0.005 ? '' : delta > 0 ? 'appreciation-text' : 'depreciation-text'}>{delta === undefined ? '暂无对比' : (delta > 0 ? '+' : '') + delta.toFixed(2) + '%'}{delta !== undefined && Math.abs(delta) >= 0.005 && (delta > 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />)}</strong></div>
+          <div className="chart-heading"><span>过去 90 天</span><span>{quote} / {base}</span></div>
+          {base === quote ? <p className="chart-message">两边是同一种货币，兑换比例恒为 1。选择另一币种查看走势。</p> : historyState === 'loading' ? <div className="chart-message skeleton" aria-label="正在加载历史走势" /> : historyState === 'error' ? <div className="chart-message">历史数据暂不可用。<button className="text-button" onClick={() => setHistoryRetry(n => n + 1)}>重试</button></div> : <LineChart rows={history} base={base!} quote={quote} />}
         </> : <div className="rate-empty"><p>{selected?.currency ? 'Frankfurter 暂未提供该币种报价。' : '此地区未匹配到唯一流通货币。'}</p><small>请选择其他国家查看报价。</small></div>}
-        <div className="quick-countries" aria-label="常用国家">{quickCountries.map(country => <button key={country.iso} aria-pressed={selected?.iso === country.iso} className={selected?.iso === country.iso ? 'selected' : ''} onClick={() => { const found = countries.find(c => c.iso === country.iso); if (found) choose(found) }}>{country.name}</button>)}</div>
+        <fieldset className="quote-currencies"><legend>兑换成</legend><div className="currency-options">{quoteCurrencies.map(currency => <button key={currency.code} aria-pressed={quote === currency.code} className={quote === currency.code ? 'selected' : ''} onClick={() => setQuote(currency.code)}><span>{currency.name}</span><small>{currency.code}</small></button>)}</div></fieldset>
         <div className="country-reading"><span>相关课程内容</span>{(relatedReadings[selected?.iso || ''] || defaultReadings).map(item => <a key={item.id} href={lessonHref(item.id, item.section)}>{item.title}<ArrowUpRight size={13} /></a>)}</div>
       </aside>
     </div>
-    <div className="atlas-caption"><p>Frankfurter 每日参考价，非盘中实时价。变化为“每美元可兑换的本币数量”的百分比：数值上升表示本币贬值。图层中 ±0.5% 以内视为小幅变化，无报价地区不比较涨跌；所选国家单独高亮。</p><a href="https://frankfurter.dev/" target="_blank" rel="noreferrer">数据说明<ArrowUpRight size={14} /></a></div>
+    <div className="atlas-caption"><p>Frankfurter 每日参考价，非盘中实时价。报价单位为“目标货币／本币”；数值上升表示本币相对所选币种升值。30 日图层随目标币种切换，±0.5% 以内视为小幅变化，未取得报价的地区不比较涨跌；所选国家单独高亮。不同币种的参考日期可能不同。</p><a href="https://frankfurter.dev/" target="_blank" rel="noreferrer">数据说明<ArrowUpRight size={14} /></a></div>
     <section className="map-to-order">
       <div><h2>出口业务中的汇率风险</h2><p>一笔 10 万美元的出口货款，三个月后到账。人民币收入取决于收款日汇率和企业的套期安排。</p></div>
       <a className="order-bridge" href="#learn/accounts"><span className="bridge-amount">$100,000<small>出口应收款</small></span><span className="bridge-arrow"><ArrowRight size={26} /></span><span className="bridge-question">国际收支<br />与汇率敞口</span></a>

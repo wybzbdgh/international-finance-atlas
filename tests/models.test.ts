@@ -1,6 +1,8 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { triangularArbitrage, parityForward, depositReturns, realExchangeRate, effectiveExchangeRates, overshootingPath, debtPath, firstYearFinancingNeed, bondPresentValue, hedgedLoanCost, exportHedge, stablecoinRedemption, iipReconciliation } from '../src/lib/models.ts'
+import { crossRate, pairChange, sortHistory } from '../src/lib/fx.ts'
+import { completeRegionalCentre, initialRepoBalance, monetaryScenario, repayRepo, repoPosition, sellSecurities } from '../src/lib/activities.ts'
 
 const near = (actual: number, expected: number, tolerance = 1e-8) => assert.ok(Math.abs(actual - expected) < tolerance, `${actual} differs from ${expected}`)
 
@@ -87,4 +89,67 @@ test('IIP reconciles transactions and valuation independently', () => {
   }
   near(iipReconciliation(8, 0, 0).valuation, 100)
   near(iipReconciliation(7, 0, 20).transaction, 140)
+})
+
+test('country-currency quotes are reciprocal and consistent along all three legs', () => {
+  const snapshot = { USD: 1, CNY: 7, JPY: 140, EUR: 0.9 }
+  near(crossRate(snapshot, 'CNY', 'USD')!, 1 / 7)
+  near(crossRate(snapshot, 'JPY', 'CNY')!, 0.05)
+  for (const a of Object.keys(snapshot)) for (const b of Object.keys(snapshot)) {
+    near(crossRate(snapshot, a, b)! * crossRate(snapshot, b, a)!, 1)
+    near(crossRate(snapshot, a, b)! * crossRate(snapshot, b, 'EUR')!, crossRate(snapshot, a, 'EUR')!)
+  }
+  near(crossRate({}, 'JPY', 'JPY')!, 1)
+  assert.equal(crossRate(snapshot, 'UNKNOWN', 'USD'), undefined)
+  assert.equal(crossRate({ USD: 1, CNY: 0 }, 'CNY', 'USD'), undefined)
+  assert.equal(crossRate({ USD: 1, CNY: Infinity }, 'CNY', 'USD'), undefined)
+})
+
+test('pair appreciation uses both currencies rather than the USD leg alone', () => {
+  const previous = { USD: 1, CNY: 7, JPY: 140 }
+  const current = { USD: 1, CNY: 8, JPY: 160 }
+  near(pairChange(current, previous, 'CNY', 'USD')!, -12.5)
+  near(pairChange(current, previous, 'USD', 'CNY')!, 100 / 7)
+  near(pairChange(current, previous, 'JPY', 'CNY')!, 0)
+  near(pairChange(current, previous, 'CNY', 'CNY')!, 0)
+  assert.equal(pairChange(current, {}, 'CNY', 'USD'), undefined)
+})
+
+test('a history cannot retain another pair or duplicate calendar dates', () => {
+  const rows = sortHistory([
+    { date: '2026-10-02', base: 'JPY', quote: 'CNY', rate: 0.05 },
+    { date: '2026-10-01', base: 'JPY', quote: 'CNY', rate: 0.06 },
+    { date: '2026-10-01', base: 'JPY', quote: 'USD', rate: 0.007 },
+    { date: '2026-10-02', base: 'JPY', quote: 'CNY', rate: 0.051 }
+  ], 'JPY', 'CNY')
+  assert.deepEqual(rows.map(row => row.date), ['2026-10-01', '2026-10-02'])
+  near(rows[1].rate, 0.051)
+})
+
+test('collateral sales lose equity and reduce capacity; bridge loans only replace funding', () => {
+  const initial = { ...initialRepoBalance, haircut: 0.25 }
+  near(repoPosition(initial).gap, 20); near(repoPosition(initial).equity, 5)
+  const sold = sellSecurities(initial)
+  near(sold.cash, 8); near(repoPosition(sold).equity, 3); near(repoPosition(sold).gap, 27.5)
+  const paid = repayRepo(sold)
+  near(paid.cash, 0); near(repoPosition(paid).gap, 19.5); near(repoPosition(paid).equity, 3)
+  const bridge = repayRepo({ ...initial, cash: 20, bridgeDebt: 20 })
+  near(repoPosition(bridge).gap, 0); near(repoPosition(bridge).equity, 5)
+  near(bridge.repoDebt + bridge.bridgeDebt, initial.repoDebt)
+  for (const sale of [0, 10, 25, 100, 200]) {
+    const result = sellSecurities(initial, sale)
+    const soldValue = Math.min(sale, 100)
+    near(repoPosition(result).equity, 5 - soldValue * 0.2)
+    assert.ok(result.securities >= 0 && result.cash >= 0)
+    near(repoPosition(repayRepo(result)).equity, repoPosition(result).equity)
+  }
+})
+
+test('monetary scenarios distinguish a functional centre from a complete regional one', () => {
+  for (const deepMarkets of [false, true]) for (const liquidity of [false, true]) {
+    assert.equal(monetaryScenario({ thirdParty: false, connected: true, deepMarkets, liquidity }), 'A')
+    assert.equal(monetaryScenario({ thirdParty: true, connected: false, deepMarkets, liquidity }), 'C')
+    assert.equal(monetaryScenario({ thirdParty: true, connected: true, deepMarkets, liquidity }), 'B')
+    assert.equal(completeRegionalCentre({ thirdParty: true, connected: true, deepMarkets, liquidity }), deepMarkets && liquidity)
+  }
 })

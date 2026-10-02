@@ -2,6 +2,8 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Check, ChevronRight, Menu, Moon, Search, Sun, X } from 'lucide-react'
 import { courseModules, courseStats, lessons, lessonById, lessonHref, type ComparisonTable, type Lesson, type Quiz } from './content'
 import Experiment from './components/Experiments'
+import ReadingActivity from './components/ReadingActivity'
+import { activityTitles } from './activities-data'
 
 const WorldAtlas = lazy(() => import('./components/WorldAtlas'))
 type Route = { page: 'map' | 'learn'; lesson?: Lesson; section?: 'cases' | 'readings' }
@@ -42,7 +44,7 @@ const titleParts: Partial<Record<Lesson['id'], string[]>> = {
 function CourseOverview() {
   const [query, setQuery] = useState('')
   const needle = query.trim().toLowerCase()
-  const matches = lessons.filter(lesson => !needle || (lesson.title + ' ' + lesson.subtitle + ' ' + lesson.sections.map(section => section.title + ' ' + (section.subsections?.map(sub => sub.title).join(' ') || '')).join(' ') + ' ' + (lesson.cases?.map(item => item.title).join(' ') || '')).toLowerCase().includes(needle))
+  const matches = lessons.filter(lesson => !needle || (lesson.title + ' ' + lesson.subtitle + ' ' + lesson.sections.map(section => section.title + ' ' + (section.subsections?.map(sub => sub.title).join(' ') || '') + ' ' + (section.activity ? activityTitles[section.activity] : '')).join(' ') + ' ' + (lesson.cases?.map(item => item.title).join(' ') || '')).toLowerCase().includes(needle))
   return <main className="shell order-page course-overview page-enter" id="main-content" tabIndex={-1}>
     <section className="order-intro">
       <div className="order-copy"><span className="context-label">国际金融课程</span><h1>国际金融学<br />课程读本</h1><p>国际账户、外汇市场、开放经济政策与国际货币体系。按课程的六个模块阅读，结合模型、案例和计算。</p><a href={lessonHref('foundations')} className="primary-button">开始阅读<ArrowRight size={18} /></a></div>
@@ -75,7 +77,7 @@ function TopicNavigation({ lesson }: { lesson: Lesson }) {
     <a className="back-link" href="#learn"><ArrowLeft size={14} />课程目录</a>
     <label className="mobile-topic-select"><span>选择专题</span><select value={lesson.id} onChange={e => { window.location.hash = lessonHref(e.target.value as Lesson['id']) }}>{courseModules.map(group => <optgroup label={group.title} key={group.id}>{lessons.filter(item => item.moduleId === group.id).map(item => <option value={item.id} key={item.id}>{item.title}</option>)}</optgroup>)}</select></label>
     <div className="desktop-topic-nav"><div className="nav-module-title">{module.title}</div><nav aria-label="当前模块">{lessons.filter(item => item.moduleId === module.id).map(item => <a key={item.id} href={lessonHref(item.id)} aria-current={item.id === lesson.id ? 'page' : undefined}>{item.short}<ChevronRight size={13} /></a>)}</nav>
-      <div className="article-contents"><span>本篇内容</span>{lesson.sections.map(section => <button key={section.id} onClick={() => scrollTo(section.id)}>{section.title}</button>)}{lesson.cases && <button onClick={() => scrollTo('topic-cases')}>历史案例</button>}{lesson.readings && <button onClick={() => scrollTo('topic-readings')}>经典文献</button>}<button onClick={() => scrollTo('topic-quizzes')}>练习与解析</button></div>
+      <div className="article-contents"><span>本篇内容</span>{lesson.sections.map(section => <button key={section.id} onClick={() => scrollTo(section.id)}>{section.title}</button>)}{lesson.sections.some(section => section.activity) && <button className="activity-jump" onClick={() => { const activity = lesson.sections.find(section => section.activity)?.activity; if (activity) scrollTo('activity-' + activity) }}>随文交互<ArrowRight size={12} /></button>}{lesson.cases && <button onClick={() => scrollTo('topic-cases')}>历史案例</button>}{lesson.readings && <button onClick={() => scrollTo('topic-readings')}>经典文献</button>}<button onClick={() => scrollTo('topic-quizzes')}>练习与解析</button></div>
       <details className="module-switcher"><summary>其他模块<ChevronRight size={14} /></summary>{courseModules.filter(item => item.id !== module.id).map(item => <a key={item.id} href={lessonHref(lessons.find(topic => topic.moduleId === item.id)!.id)}>{item.title}<ArrowUpRight size={12} /></a>)}</details>
     </div>
   </aside>
@@ -90,7 +92,7 @@ function LessonReader({ lesson }: { lesson: Lesson }) {
     <section className="lesson-intro"><div className="lesson-position">{module.title}</div><h1>{(titleParts[lesson.id] || [lesson.title]).map(part => <span className="title-phrase" key={part}>{part}</span>)}</h1><p className="lesson-subtitle">{lesson.subtitle}</p><div className="learning-objectives"><h2>学习要求</h2><ul>{lesson.objectives.map(text => <li key={text}>{text}</li>)}</ul></div></section>
     {hasExperiment && <aside className="lesson-experiment"><Experiment kinds={lesson.experiments} topicId={lesson.id} /><p className="experiment-reading-note">正文与计算使用同一标价法；参数为教学设定。</p></aside>}
     <article className="lesson-body">
-      {lesson.sections.map(section => <section className="prose-section" id={section.id} key={section.id}><h2>{section.title}</h2><Paragraphs texts={section.paragraphs} />{section.subsections?.map(sub => <div className="prose-subsection" key={sub.title}><h3>{sub.title}</h3><Paragraphs texts={sub.paragraphs} /></div>)}{section.formulas && <div className="formula-group">{section.formulas.map(item => <div className="reading-formula" key={item.expression}><div className="formula-expression">{item.expression}</div><p>{item.explanation}</p></div>)}</div>}{section.table && <ContentTable table={section.table} />}</section>)}
+      {lesson.sections.map(section => <section className="prose-section" id={section.id} key={section.id}><h2>{section.title}</h2><Paragraphs texts={section.paragraphs} />{section.subsections?.map(sub => <div className="prose-subsection" key={sub.title}><h3>{sub.title}</h3><Paragraphs texts={sub.paragraphs} /></div>)}{section.formulas && <div className="formula-group">{section.formulas.map(item => <div className="reading-formula" key={item.expression}><div className="formula-expression">{item.expression}</div><p>{item.explanation}</p></div>)}</div>}{section.table && <ContentTable table={section.table} />}{section.activity && <ReadingActivity kind={section.activity} />}</section>)}
       {lesson.cases && <section className="case-collection" id="topic-cases"><h2>历史案例</h2>{lesson.cases.map(item => <section className="case-study" key={item.title}><h3>{item.title}</h3><Paragraphs texts={item.paragraphs} /></section>)}</section>}
       {lesson.readings && <section className="reading-collection" id="topic-readings"><h2>经典文献</h2>{lesson.readings.map(item => <section className="classic-reading" key={item.title}><div className="reading-author">{item.author} · {item.year}</div><h3>{item.question}</h3><p>{item.finding}</p><p className="reading-limit">{item.limit}</p><a href={item.href} target="_blank" rel="noreferrer">{item.title}<ArrowUpRight size={17} /></a></section>)}</section>}
       <section className="quiz-collection" id="topic-quizzes"><h2>练习与解析</h2>{lesson.quizzes.map((quiz, i) => <QuizItem quiz={quiz} number={i + 1} key={quiz.id} />)}</section>
