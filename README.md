@@ -1,46 +1,70 @@
 # 汇流 · 国际金融互动图谱
 
-一个面向《国际金融》课程的小组网站：用可点击的世界地图查看每日参考汇率与历史走势，再通过课程专题、政策实验、案例和经典阅读把数据与理论连起来。
+[访问课程网站](https://wybzbdgh.github.io/international-finance-atlas/)
 
-## 网站包含什么
+面向国际金融课程学生的互动网站。先在地图上观察每日参考汇率，再跟随一笔三个月后收取 10 万美元的出口订单，理解交易、价格、政策、危机与货币网络。
 
-- **世界地图**：242 个国家及地区边界；地球 / 平面视图、搜索和快捷切换。每个地区都可点击；有 Frankfurter 报价时显示美元兑当地货币、当地货币兑人民币和过去 90 天走势。缺少报价时明确说明。
-- **30 日变化图层**：统一比较“每 1 美元可兑换多少当地货币”的百分比变化。红色代表本币相对美元贬值，绿色代表升值。原始汇率水平不作为跨国颜色比较依据。
-- **六个课程专题**：国际收支、汇率定价、开放经济政策、危机、企业外汇风险、国际货币体系。
-- **两个交互实验**：不可能三角的政策目标选择，以及出口订单的远期锁汇试算。
-- **阅读与案例**：蒙代尔、Dornbusch、Krugman 的经典论文入口；1997、2008、2015 年案例入口。
+## 内容结构
 
-## 数据与教学边界
+主导航为 **全球汇率 / 跟着订单学 / 课程索引**。
 
-- 汇率来自 [Frankfurter](https://frankfurter.dev/)，属于**每日参考价**，不是盘中实时价，也不是银行可成交报价。非交易日可能显示最近一个数据日。网页会展示实际数据日期。
-- 国家边界来自 [Natural Earth 1:50m](https://www.naturalearthdata.com/)，为公有领域数据；地图仅用于教学展示，不表达政治立场。极小地区在地图上可使用搜索框定位。
-- 国家与币种的对应以 [world-countries](https://www.npmjs.com/package/world-countries) 数据包为基础。多币种地区仅选一个主要币种用于演示，无法精确代表当地所有支付场景。
-- `public/data/countries.json` 中的币种映射派生自 world-countries，其数据库条款见 [`public/data/ODbL-LICENSE.txt`](public/data/ODbL-LICENSE.txt)；派生数据库按 ODbL 1.0 共享。
-- 锁汇实验中的远期汇率是用户设定的教学假设；未计交易成本、信用风险、结算时点和会计处理。
+| 章节 | 核心问题 | 交互 |
+| --- | --- | --- |
+| 跨境记账 | 出口、收款、境内结汇分别改变什么？ | 三个时点的 BPM6 分录 |
+| 汇率与锁汇 | 美元应收款能换回多少人民币？ | 部分与全部套期、PPP、CIP |
+| 政策与资本 | 制度怎样改变政策传导？ | 固定／浮动汇率下货币与财政扩张 |
+| 压力与危机 | 价格变化如何变成融资压力？ | 币种错配与短期债务不续借 |
+| 货币与支付 | 付款指令、结算与货币地位是什么关系？ | 美元／人民币合同的四个支付环节 |
+
+每章包含订单情境、判断题、解释、可展开的理论与来源。经典论文嵌入相关问题，说明其研究问题、结论和适用条件。课程索引按大纲的六个模块、14 讲排列，可搜索关键词。内容概括主要机制，不替代完整讲义与课堂推导。
+
+## 课程与资料
+
+文字依据用户提供的陈泽丰《国际金融学：大国崛起视角》（讲义版／教材初稿，2026）和《国际金融课程大纲：2026 秋》。章节页标明相关章节或印刷页。带引号并署名的短句为讲义原文，其余为教学整理。完整讲义 PDF 未上传到公开仓库。
+
+论文入口包括 Mundell（1963）、Dornbusch（1976）和 Krugman（1979）。1997 年亚洲危机、美元流动性互换及人民币中间价机制调整提供官方资料入口。
+
+## 数据与模型口径
+
+- **汇率**：来自 [Frankfurter](https://frankfurter.dev/)，为每日参考价，非盘中实时价或银行可成交报价。日期按 API 返回值显示；非交易日可能沿用最近一个数据日。无法取得报价、历史数据或地图时显示说明及重试入口。
+- **地图**：242 个国家及地区边界，可点击、搜索、键盘选择，提供地球／平面视图和常用国家切换。30 日变化比较“每 1 美元可兑换的本币数量”的百分比；数值上升意味着本币相对美元贬值。图层 ±0.5% 内作为小幅变化，灰色地区无报价；所选国家用单独的轮廓和填色强调。
+- **边界与币种**：[Natural Earth 1:50m](https://www.naturalearthdata.com/) 边界为公有领域数据；地图仅用于教学。币种匹配派生自 [world-countries](https://github.com/mledoze/countries)，多币种地区只选一个主要币种用于演示，不能代表所有当地支付场景。派生数据库 public/data/countries.json 按 ODbL 1.0 共享，条款见 public/data/ODbL-LICENSE.txt。
+- **国际收支**：沿用讲义的 BPM6 口径，金融账户以“资产净获得减负债净产生”表示，净贷出为正。出口按经济所有权转移记录；应收款收回不重复记录出口。居民之间转让外部资产不新增标准 BOP 交易。
+- **金额与利率**：所有订单实验参数均为教学设定。CIP 使用同期限、简单计息、无摩擦基准，三个月按 T = 0.25 计算。远期汇率不是未来即期汇率的直接预测。套期未计交易费、授信与违约；危机实验未计利息和资产价格变动。
+- **政策**：小型开放经济、短期价格黏性，资本高度流动、风险和预期给定。传导展示方向，不给出效果的数量预测。资本流动管理改变原基准的适用条件。
+- **支付**：展示概念性路径，未展示实时资金流或某笔实际银行路线。交易义务、报文、清算和结算顺次讨论；托管为平行的资产控制层。
+- **配图**：public/assets/export-port.webp 为 AI 生成的虚构港口教学情境图，页面已标明，不能作为历史事件的证据。
+
+## 设计与阅读
+
+全站使用冷灰与薄荷色，默认夜间主题，可切换日间阅读并保存在本地。中文使用系统无衬线字体；Geist 与 Geist Mono 随站点打包，以 font-display: swap 加载，不请求 Google Fonts。地图聚焦、章节切换、政策链条动画用于反馈和传导说明，尊重减少动态效果的系统设置。
+
+桌面章节页采用目录、正文和交互侧栏；手机按情境、判断题、交互、正文顺序排列。地图独立加载，阅读页可直接访问；旧版主要锚点保留对应入口。
 
 ## 在 Mac 上运行
 
-需要 Node.js 24 和 pnpm 11。
+需要 Node.js 24 与 pnpm 11。
 
-```bash
-git clone https://github.com/你的用户名/international-finance-atlas.git
-cd international-finance-atlas
-pnpm install
-pnpm dev
-```
+    git clone https://github.com/wybzbdgh/international-finance-atlas.git
+    cd international-finance-atlas
+    pnpm install
+    pnpm dev
 
-打开终端显示的本地地址。提交前运行：
+打开终端显示的 HTTP 地址。不要在 Finder 直接双击源码 index.html；直接打开时会显示公开网站入口。
 
-> 不要在 Finder 中直接双击源码目录里的 `index.html`；它依赖 Vite 处理 TypeScript。若只想看成品，请访问上方的 GitHub Pages 网址。
+    pnpm build
+    pnpm preview
 
-```bash
-pnpm build
-```
+## 发布
 
-## 发布到 GitHub Pages
+.github/workflows/deploy.yml 在 main 更新后构建并部署到 GitHub Pages。仓库 Settings → Pages 使用 GitHub Actions。Vite 根据 GITHUB_REPOSITORY 设置仓库子路径。站内使用 hash 路由，直接进入某章不会触发 Pages 的服务器路由 404。
 
-仓库中的 [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) 会在 `main` 分支更新后自动构建并发布。GitHub 仓库的 **Settings → Pages → Build and deployment** 需要设置为 **GitHub Actions**。Vite 会依据 `GITHUB_REPOSITORY` 自动设置子路径，所以网址格式为 `https://用户名.github.io/international-finance-atlas/`。
+## 维护
 
-## 内容维护
+- src/content.ts：五章正文、判断题、引用和课程映射。
+- src/components/Experiments.tsx：五类交互与计算。
+- src/components/WorldAtlas.tsx：地图、搜索、每日汇率和 90 日历史。
+- src/App.tsx：导航、章节编排、索引与主题切换。
+- src/styles.css：两种主题与响应式布局。
 
-专题、案例、阅读入口位于 `src/App.tsx` 顶部的数据数组；样式位于 `src/styles.css`。汇率由浏览器直接向 Frankfurter 请求，无需 API 密钥或后端。
+更新内容时先对照讲义口径；更新计算时核对数量、单位、期限和符号。发布前构建并检查地图选择、套期终值、政策方向及手机布局。

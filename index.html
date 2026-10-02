@@ -1,20 +1,22 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0e211f" />
-    <meta name="description" content="一张可探索的国际金融地图：查看各国每日参考汇率、历史走势，并用交互实验理解经典理论。" />
+    <meta name="theme-color" content="#11161d" />
+    <meta name="description" content="查看各国每日参考汇率，跟随一笔10万美元出口订单，理解跨境记账、汇率与套期保值、宏观政策、金融危机和国际货币体系。" />
     <title>汇流 · 国际金融互动图谱</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script>
+      try { document.documentElement.dataset.theme = localStorage.getItem('finance-atlas-theme') === 'light' ? 'light' : 'dark' } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript><p style="padding:32px;font:16px/1.8 sans-serif">请启用 JavaScript，以使用国家地图与课程交互。</p></noscript>
     <script>
       if (location.protocol === 'file:') {
-        document.getElementById('root').innerHTML = '<main style="max-width:640px;margin:12vh auto;padding:32px;font:16px/1.8 sans-serif;color:#18302d"><h1>汇流 · 国际金融互动图谱</h1><p>你打开的是网站源码文件。请点击下面的公开网址查看网站；在 Mac 上本地开发时，请按照 README 运行 <code>pnpm dev</code>。</p><p><a style="color:#176e58" href="https://wybzbdgh.github.io/international-finance-atlas/">打开已发布的网站 →</a></p></main>'
+        document.getElementById('root').innerHTML = '<main style="max-width:640px;margin:12vh auto;padding:32px;font:16px/1.8 sans-serif;color:#17242f"><h1>汇流 · 国际金融互动图谱</h1><p>你打开的是网站源码文件。请点击下面的公开网址查看网站；在 Mac 上本地开发时，请按照 README 运行 <code>pnpm dev</code>。</p><p><a style="color:#256c5b" href="https://wybzbdgh.github.io/international-finance-atlas/">打开已发布的网站 →</a></p></main>'
       }
     </script>
     <script type="module" src="/src/main.tsx"></script>
