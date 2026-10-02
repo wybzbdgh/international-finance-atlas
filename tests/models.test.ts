@@ -3,8 +3,59 @@ import assert from 'node:assert/strict'
 import { triangularArbitrage, parityForward, depositReturns, realExchangeRate, effectiveExchangeRates, overshootingPath, debtPath, firstYearFinancingNeed, bondPresentValue, hedgedLoanCost, exportHedge, stablecoinRedemption, iipReconciliation } from '../src/lib/models.ts'
 import { crossRate, pairChange, sortHistory } from '../src/lib/fx.ts'
 import { completeRegionalCentre, initialRepoBalance, monetaryScenario, repayRepo, repoPosition, sellSecurities } from '../src/lib/activities.ts'
+import { foreignReturn, policyEquilibrium, relativePppPath, riskSharing, trancheLoss, uipSpot } from '../src/lib/figure-models.ts'
 
 const near = (actual: number, expected: number, tolerance = 1e-8) => assert.ok(Math.abs(actual - expected) < tolerance, `${actual} differs from ${expected}`)
+
+test('the UIP figure reproduces the lecture example and equal expected returns', () => {
+  near(uipSpot(2, 5, 7.2), 7.411764705882353)
+  for (const home of [0, 2, 10]) for (const foreign of [0, 5, 10]) for (const expected of [6.5, 7.2, 8]) {
+    near(foreignReturn(uipSpot(home, foreign, expected), foreign, expected), home)
+  }
+  assert.ok(uipSpot(5, 5, 7.2) < uipSpot(2, 5, 7.2))
+})
+
+test('relative PPP preserves the cross-country real-price relationship', () => {
+  for (const [home, foreign] of [[6, 2], [-2, 10], [4, 4]]) {
+    for (const point of relativePppPath(home, foreign)) {
+      near(point.y * (1 + foreign / 100) ** point.x / (1 + home / 100) ** point.x, 7)
+    }
+  }
+})
+
+test('linked policy diagrams satisfy all three markets at final equilibrium', () => {
+  for (const regime of ['fixed', 'float'] as const) for (const instrument of ['money', 'fiscal'] as const) for (const strength of [0, 10, 20]) {
+    const q = policyEquilibrium(regime, instrument, strength)
+    near(q.output, 100 + q.fiscal - 3 * (q.rate - 4) + 8 * (q.spot - 7))
+    near(q.rate, 4 + .12 * (q.output - 100) - q.money)
+    near(q.rate, 4 - 4 * (q.spot - 7))
+    if (regime === 'fixed') { near(q.spot, 7); near(q.rate, 4) }
+  }
+  const before = policyEquilibrium('fixed', 'money', 10, 1)
+  assert.ok(before.rate < 4 && before.pressureSpot > 7); near(before.spot, 7)
+  const after = policyEquilibrium('fixed', 'money', 10, 2)
+  near(after.money, 0); near(after.output, 100)
+  const floatFiscal = policyEquilibrium('float', 'fiscal', 10)
+  const fixedFiscal = policyEquilibrium('fixed', 'fiscal', 10)
+  assert.ok(floatFiscal.output > 100 && floatFiscal.output < fixedFiscal.output)
+})
+
+test('tranches preserve total loss and protect senior claims until junior layers exhaust', () => {
+  for (const loss of [0, 4, 5, 12, 20, 21, 100]) {
+    const tranches = trancheLoss(loss)
+    near(tranches.reduce((s, t) => s + t.loss, 0), loss)
+    near(tranches.reduce((s, t) => s + t.remaining, 0), 100 - loss)
+    assert.ok(tranches.every(t => t.remaining >= 0 && t.remaining <= t.face))
+  }
+  assert.deepEqual(trancheLoss(12).map(t => t.remaining), [80, 8, 0])
+  assert.deepEqual(trancheLoss(21).map(t => t.remaining), [79, 0, 0])
+})
+
+test('equal international asset sharing halves idiosyncratic consumption variance', () => {
+  near(riskSharing(0).variance, 400); near(riskSharing(.5).variance, 200)
+  assert.deepEqual(riskSharing(.5).consumption, [120, 100, 100, 80])
+  for (const weight of [0, .25, .5, .75, 1]) near(riskSharing(weight).consumption.reduce((a, b) => a + b, 0) / 4, 100)
+})
 
 test('consistent cross quotes leave both triangular routes at par; spreads cost money', () => {
   const fair = triangularArbitrage(1.1, 7, 7.7, 0)

@@ -1,12 +1,13 @@
 import data from './course-data.json'
 import type { ActivityId } from './activities-data'
+import type { FigureId } from './figures-data'
 
 export type LessonId = 'foundations' | 'accounts' | 'fx-market' | 'long-run' | 'short-run' | 'policy' | 'globalization' | 'regimes' | 'currency-crises' | 'crisis' | 'sovereign-debt' | 'governance' | 'development-finance' | 'capital-markets' | 'enterprise' | 'dollar' | 'sanctions' | 'renminbi' | 'digital-money' | 'future'
 export type ExperimentId = 'accounts' | 'arbitrage' | 'prices' | 'parity' | 'overshoot' | 'policy' | 'sharing' | 'trilemma' | 'crisis' | 'debt' | 'funding' | 'hedge' | 'payment' | 'stablecoin'
 export type Reading = { author: string; year: string; title: string; question: string; finding: string; limit: string; href: string }
 export type Formula = { expression: string; explanation: string }
 export type ComparisonTable = { caption: string; headers: string[]; rows: string[][] }
-export type Section = { id: string; title: string; paragraphs: string[]; subsections?: { title: string; paragraphs: string[] }[]; formulas?: Formula[]; table?: ComparisonTable; activity?: ActivityId }
+export type Section = { id: string; title: string; paragraphs: string[]; subsections?: { title: string; paragraphs: string[]; figure?: FigureId }[]; formulas?: Formula[]; table?: ComparisonTable; activity?: ActivityId; figure?: FigureId }
 export type Quiz = { id: string; question: string; choices: string[]; answer: number; explanation: string }
 export type CaseStudy = { title: string; paragraphs: string[] }
 export type Lesson = {
