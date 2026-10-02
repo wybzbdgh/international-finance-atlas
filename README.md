@@ -31,6 +31,8 @@ pnpm dev
 
 打开终端显示的本地地址。提交前运行：
 
+> 不要在 Finder 中直接双击源码目录里的 `index.html`；它依赖 Vite 处理 TypeScript。若只想看成品，请访问上方的 GitHub Pages 网址。
+
 ```bash
 pnpm build
 ```
