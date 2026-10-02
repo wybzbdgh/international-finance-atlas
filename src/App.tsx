@@ -40,7 +40,7 @@ const readings = [
 const cases = [
   { id: 'asia', year: '1997', title: '亚洲金融危机', place: '东亚与东南亚', clue: '固定或准固定汇率、短期外债、资本流动逆转形成连锁压力。', question: '如果企业持有大量外币债务，本币贬值会怎样改变资产负债表？', source: 'https://www.imf.org/external/pubs/ft/fandd/1998/06/imfstaff.htm' },
   { id: 'global', year: '2008', title: '全球金融危机', place: '全球', clue: '美元融资市场紧张，跨境资金和贸易同时收缩，央行流动性互换成为关键工具。', question: '为什么一家非美国银行也可能依赖美元融资？', source: 'https://www.federalreserve.gov/monetarypolicy/bst_liquidityswaps.htm' },
-  { id: 'china', year: '2015', title: '人民币汇率形成机制调整', place: '中国', clue: '中间价形成机制变化后，市场预期与跨境资本流动受到更密切关注。', question: '汇率政策变化如何影响市场对未来价格的预期？', source: 'https://www.pbc.gov.cn/en/3688110/3688172/3712221/index.html' },
+  { id: 'china', year: '2015', title: '人民币汇率形成机制调整', place: '中国', clue: '中间价形成机制变化后，市场预期与跨境资本流动受到更密切关注。', question: '汇率政策变化如何影响市场对未来价格的预期？', source: 'https://www.gov.cn/xinwen/2015-08/11/content_2911053.htm' },
 ]
 
 const graticule = (() => {
