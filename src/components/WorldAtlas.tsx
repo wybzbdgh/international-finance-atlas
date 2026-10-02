@@ -231,9 +231,9 @@ export default function WorldAtlas({ theme, visible }: { theme: 'dark' | 'light'
     <div className="atlas-topline"><span>国际金融互动图谱</span><span className="data-date">{date ? '参考日 ' + date : '每日参考汇率'}</span></div>
     <div className="atlas-hero">
       <section className="atlas-intro">
-        <h1>货币之间，<br /><span>世界相连。</span></h1>
-        <p>点选一个国家，看它的货币如何兑换美元和人民币。</p>
-        <a href="#learn" className="primary-button">跟着订单学<ArrowRight size={18} /></a>
+        <h1>世界货币<br /><span>汇率地图</span></h1>
+        <p>选择国家，查看本币对美元、人民币的每日参考汇率。</p>
+        <a href="#learn" className="primary-button">课程读本<ArrowRight size={18} /></a>
       </section>
       <div className="map-stage">
         <div className="map-toolbar">
@@ -242,7 +242,7 @@ export default function WorldAtlas({ theme, visible }: { theme: 'dark' | 'light'
           <button className="icon-button" aria-label="重置地图视角" title="重置地图视角" onClick={resetMap}><RotateCcw size={16} /></button>
         </div>
         <div className="map-viewport" ref={mapEl} role="region" aria-label="交互世界地图，可拖动旋转。也可以使用旁边的国家搜索。" />
-        {mapState === 'loading' && <div className="map-loading" role="status"><div className="skeleton globe-skeleton" /><span>正在展开世界地图</span></div>}
+        {mapState === 'loading' && <div className="map-loading" role="status"><div className="skeleton globe-skeleton" /><span>正在加载地图</span></div>}
         {mapState === 'error' && <div className="map-error" role="status"><Globe2 size={34} /><p>地图暂时无法显示。</p><button className="secondary-button" onClick={() => setMapRetry(n => n + 1)}>重新加载地图</button><small>{countries.length ? '仍可使用国家搜索查看汇率。' : '重新连接后可继续选择国家。'}</small></div>}
         {changeMode && <div className="map-legend"><span><i className="appreciation" />本币升值</span><span><i className="stable" />小幅变化</span><span><i className="depreciation" />本币贬值</span><span><i className="no-rate" />无报价</span>{!previous.length && <small>暂未取得对比日数据</small>}</div>}
         <div className="map-instruction">拖动旋转 · 使用 ＋ / − 缩放</div>
@@ -261,7 +261,7 @@ export default function WorldAtlas({ theme, visible }: { theme: 'dark' | 'light'
               if (e.key === 'Enter' && query && filtered.length) { e.preventDefault(); choose(filtered[Math.max(searchIndex, 0)]) }
             }} />
           {query && <button aria-label="清除搜索" onClick={() => { setQuery(''); setSearchOpen(false) }}><X size={15} /></button>}
-          {searchOpen && query && <div className="search-results" id="country-results" role="listbox">{filtered.length ? filtered.map((country, i) => <button id={'country-result-' + i} role="option" aria-selected={i === searchIndex} className={i === searchIndex ? 'highlighted' : ''} onMouseDown={e => e.preventDefault()} key={country.id} onClick={() => choose(country)}><span>{country.name}</span><small>{country.currency || '未匹配币种'}</small></button>) : <p>没有找到，请试试币种代码。</p>}</div>}
+          {searchOpen && query && <div className="search-results" id="country-results" role="listbox">{filtered.length ? filtered.map((country, i) => <button id={'country-result-' + i} role="option" aria-selected={i === searchIndex} className={i === searchIndex ? 'highlighted' : ''} onMouseDown={e => e.preventDefault()} key={country.id} onClick={() => choose(country)}><span>{country.name}</span><small>{country.currency || '未匹配币种'}</small></button>) : <p>未找到对应国家或货币。</p>}</div>}
         </div>
         <div className="country-name" aria-live="polite"><div><span>{selected?.nameEn || 'Select a country'}</span><h2 title={selected?.name} className={(selected?.name.length || 0) > 8 && !commonNames[selected?.iso || ''] ? 'long-country-name' : ''}>{selected ? commonNames[selected.iso] || selected.name : '选择一个国家'}</h2></div><span className="currency-code">{selected?.currency || '暂无币种'}</span></div>
         {rateState === 'loading' ? <div className="rate-loading" role="status"><span className="skeleton skeleton-number" /><span className="skeleton skeleton-text" /><p>正在取得参考汇率</p></div> : rateState === 'error' ? <div className="rate-empty"><p>汇率服务暂时无法连接。</p><button className="text-button" onClick={() => setRetry(n => n + 1)}>重新获取<RotateCcw size={14} /></button></div> : selectedRate ? <>
@@ -270,15 +270,15 @@ export default function WorldAtlas({ theme, visible }: { theme: 'dark' | 'light'
           <div className="rate-change"><span>兑美元 · 近 30 日</span><strong className={delta === undefined || Math.abs(delta) < 0.005 ? '' : delta > 0 ? 'depreciation-text' : 'appreciation-text'}>{delta === undefined ? '暂无对比' : (delta > 0 ? '+' : '') + delta.toFixed(2) + '%'}{delta !== undefined && delta !== 0 && (delta > 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />)}</strong></div>
           <div className="chart-heading"><span>过去 90 天</span><span>1 USD / {selected?.currency}</span></div>
           {selected?.currency === 'USD' ? <p className="chart-message">美元是计价基准。选择其他国家查看变化。</p> : historyState === 'loading' ? <div className="chart-message skeleton" aria-label="正在加载历史走势" /> : historyState === 'error' ? <div className="chart-message">历史数据暂不可用。<button className="text-button" onClick={() => setHistoryRetry(n => n + 1)}>重试</button></div> : <LineChart rows={history} currency={selected?.currency || ''} />}
-        </> : <div className="rate-empty"><p>{selected?.currency ? 'Frankfurter 暂未提供该币种报价。' : '此地区未匹配到唯一流通货币。'}</p><small>可以继续浏览地图，或选择其他国家。</small></div>}
+        </> : <div className="rate-empty"><p>{selected?.currency ? 'Frankfurter 暂未提供该币种报价。' : '此地区未匹配到唯一流通货币。'}</p><small>请选择其他国家查看报价。</small></div>}
         <div className="quick-countries" aria-label="常用国家">{quickCountries.map(country => <button key={country.iso} aria-pressed={selected?.iso === country.iso} className={selected?.iso === country.iso ? 'selected' : ''} onClick={() => { const found = countries.find(c => c.iso === country.iso); if (found) choose(found) }}>{country.name}</button>)}</div>
       </aside>
     </div>
     <div className="atlas-caption"><p>Frankfurter 每日参考价，非盘中实时价。变化为“每美元可兑换的本币数量”的百分比：数值上升表示本币贬值。图层中 ±0.5% 以内视为小幅变化，无报价地区不比较涨跌；所选国家单独高亮。</p><a href="https://frankfurter.dev/" target="_blank" rel="noreferrer">数据说明<ArrowUpRight size={14} /></a></div>
     <section className="map-to-order">
-      <div><h2>汇率如何进入一张订单？</h2><p>10 万美元，三个月后收款。从这笔业务开始，依次看账户、汇率、政策、危机和支付网络。</p></div>
-      <a className="order-bridge" href="#learn/accounts"><span className="bridge-amount">$100,000<small>出口应收款</small></span><span className="bridge-arrow"><ArrowRight size={26} /></span><span className="bridge-question">最后换回<br />多少人民币？</span></a>
+      <div><h2>出口业务中的汇率风险</h2><p>一笔 10 万美元的出口货款，三个月后到账。人民币收入取决于收款日汇率和企业的套期安排。</p></div>
+      <a className="order-bridge" href="#learn/accounts"><span className="bridge-amount">$100,000<small>出口应收款</small></span><span className="bridge-arrow"><ArrowRight size={26} /></span><span className="bridge-question">国际收支<br />与汇率敞口</span></a>
     </section>
-    <a className="inline-link course-index-link" href="#index">按课程大纲找概念<ChevronDown size={15} /></a>
+    <a className="inline-link course-index-link" href="#index">查看课程索引<ChevronDown size={15} /></a>
   </main>
 }

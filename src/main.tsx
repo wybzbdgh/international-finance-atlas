@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import '@fontsource-variable/geist'
+import '@fontsource-variable/inter/wght.css'
 import '@fontsource-variable/geist-mono'
 import './styles.css'
 
