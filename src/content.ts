@@ -27,7 +27,7 @@ export type CourseModule = { id: string; title: string; description: string }
 const course = data as { modules: CourseModule[]; lessons: Lesson[] }
 export const lessons = course.lessons
 export const courseModules = course.modules
-export const lessonHref = (id: LessonId, section?: 'cases' | 'readings') => '#learn/' + id + (section ? '/' + section : '')
+export const lessonHref = (id: LessonId, section?: string) => '#learn/' + id + (section ? '/' + section : '')
 const aliases: Record<string, LessonId> = { exchange: 'fx-market', system: 'dollar' }
 export const lessonById = (id: string) => lessons.find(lesson => lesson.id === (aliases[id] || id))
 export const courseStats = {

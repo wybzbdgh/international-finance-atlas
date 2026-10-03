@@ -1,6 +1,6 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronRight, Menu, Moon, Search, Sun, X } from 'lucide-react'
-import { courseModules, lessons, lessonById, lessonHref, type ComparisonTable, type Lesson, type Quiz } from './content'
+import { courseModules, lessons, lessonById, lessonHref, type ComparisonTable, type Lesson, type Quiz, type Section } from './content'
 import Experiment from './components/Experiments'
 import ReadingActivity from './components/ReadingActivity'
 import { activityTitles } from './activities-data'
@@ -36,6 +36,137 @@ function ContentTable({ table }: { table: ComparisonTable }) {
   </div><p className="table-scroll-note">表格可左右滑动。</p></>
 }
 
+// Search helpers --------------------------------------------------------------
+
+type ParagraphSource = { text: string; id: string; subsection?: NonNullable<Section['subsections']>[number] }
+type ParagraphMatch = { text: string; id: string; section: Section; subsection?: NonNullable<Section['subsections']>[number] }
+type LessonMatch = { lesson: Lesson; matches: ParagraphMatch[] }
+
+function paragraphSources(section: Section): ParagraphSource[] {
+  const sources: ParagraphSource[] = []
+  section.paragraphs.forEach((text, i) => sources.push({ text, id: `${section.id}-p-${i}` }))
+  section.subsections?.forEach((sub, subIndex) => {
+    sub.paragraphs.forEach((text, i) => sources.push({ text, id: `${section.id}-sub-${subIndex}-p-${i}`, subsection: sub }))
+  })
+  return sources
+}
+
+function orderedMatchPositions(text: string, query: string): number[] | null {
+  const normalizedText = text.toLowerCase()
+  const normalizedQuery = query.toLowerCase()
+  const chars = [...normalizedQuery]
+  const positions: number[] = []
+  let index = 0
+  for (const char of chars) {
+    const next = normalizedText.indexOf(char, index)
+    if (next === -1) return null
+    positions.push(next)
+    index = next + 1
+  }
+  return positions
+}
+
+function matchesQuery(text: string, query: string): boolean {
+  return orderedMatchPositions(text, query) !== null
+}
+
+function Highlight({ text, query }: { text: string; query: string }) {
+  const positions = orderedMatchPositions(text, query)
+  if (!positions) return <>{text}</>
+  const posSet = new Set(positions)
+  const parts: ReactNode[] = []
+  let last = 0
+  for (let i = 0; i < text.length; i++) {
+    if (posSet.has(i)) {
+      if (i > last) parts.push(<span key={`t${last}`}>{text.slice(last, i)}</span>)
+      parts.push(<mark key={`m${i}`}>{text[i]}</mark>)
+      last = i + 1
+    }
+  }
+  if (last < text.length) parts.push(<span key={`t${last}`}>{text.slice(last)}</span>)
+  return <>{parts}</>
+}
+
+function searchBodyText(query: string): LessonMatch[] {
+  const needle = query.trim().toLowerCase()
+  if (!needle) return []
+  const result: LessonMatch[] = []
+  for (const lesson of lessons) {
+    const matches: ParagraphMatch[] = []
+    for (const section of lesson.sections) {
+      for (const source of paragraphSources(section)) {
+        if (matchesQuery(source.text, needle)) {
+          matches.push({ text: source.text, id: source.id, section, subsection: source.subsection })
+        }
+      }
+    }
+    if (matches.length) result.push({ lesson, matches })
+  }
+  return result
+}
+
+function groupMatchesBySection(matches: ParagraphMatch[]) {
+  const groups = new Map<string, { section: Section; subsection?: NonNullable<Section['subsections']>[number]; items: ParagraphMatch[] }>()
+  for (const match of matches) {
+    const key = match.section.id + '::' + (match.subsection?.title || '')
+    if (!groups.has(key)) groups.set(key, { section: match.section, subsection: match.subsection, items: [] })
+    groups.get(key)!.items.push(match)
+  }
+  return [...groups.values()]
+}
+
+function ModuleList({ modules, lessons: lessonList }: { modules: typeof courseModules; lessons: typeof lessons }) {
+  return <div className="course-module-list">{modules.map(module => {
+    const items = lessonList.filter(lesson => lesson.moduleId === module.id)
+    if (!items.length) return null
+    return <section className="module-section" id={`module-${module.id}`} key={module.id}><div className="module-heading"><h3>{module.title}</h3><p>{module.description}</p></div><div className="module-lessons">{items.map(lesson => <a className="topic-link" href={lessonHref(lesson.id)} key={lesson.id}><div><h4>{lesson.title}</h4><p>{lesson.subtitle}</p></div><ArrowUpRight size={19} /></a>)}</div></section>
+  })}</div>
+}
+
+function CourseSidebar() {
+  const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' })
+  return <aside className="course-nav" aria-label="课程模块">
+    <a className="back-link" href="#map"><ArrowLeft size={14} />返回地图</a>
+    <div className="desktop-topic-nav">
+      <div className="nav-module-title">课程模块</div>
+      <nav>{courseModules.map(module => <a key={module.id} href={`#module-${module.id}`} onClick={event => { event.preventDefault(); scrollTo(`module-${module.id}`) }}>{module.title}<ChevronRight size={13} /></a>)}</nav>
+    </div>
+  </aside>
+}
+
+function SearchResults({ query, results, onClear }: { query: string; results: LessonMatch[]; onClear: () => void }) {
+  const total = results.reduce((n, item) => n + item.matches.length, 0)
+  return <div className="course-search-results" role="region" aria-label="正文搜索结果">
+    <div className="course-search-results-toolbar">
+      <p className="search-count" role="status">找到 {total} 处匹配</p>
+      <button className="text-button back-to-directory" onClick={onClear}><ArrowLeft size={14} />返回课程目录</button>
+    </div>
+    {results.map(({ lesson, matches }) => (
+      <section className="search-result-lesson" key={lesson.id}>
+        <div className="search-result-lesson-heading">
+          <h3>{lesson.title}</h3>
+          <p>{lesson.subtitle}</p>
+          <a className="text-button" href={lessonHref(lesson.id)}>查看专题<ArrowUpRight size={14} /></a>
+        </div>
+        <div className="search-result-sections">
+          {groupMatchesBySection(matches).map(({ section, subsection, items }) => (
+            <div className="search-result-section" key={section.id + '::' + (subsection?.title || '')}>
+              <h4>{section.title}{subsection ? ` · ${subsection.title}` : ''}</h4>
+              <div className="search-result-snippets">
+                {items.map(match => (
+                  <a key={match.id} href={lessonHref(lesson.id, match.id)} className="search-result-snippet">
+                    <p><Highlight text={match.text} query={query} /></p>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+}
+
 const titleParts: Partial<Record<Lesson['id'], string[]>> = {
   accounts: ['国际收支与', '对外资产负债表'],
   'long-run': ['长期汇率：', '购买力平价与', '货币分析法'],
@@ -51,21 +182,40 @@ const titleParts: Partial<Record<Lesson['id'], string[]>> = {
 function CourseOverview() {
   const [query, setQuery] = useState('')
   const needle = query.trim().toLowerCase()
-  const matches = lessons.filter(lesson => !needle || (lesson.title + ' ' + lesson.subtitle + ' ' + lesson.sections.map(section => section.title + ' ' + (section.subsections?.map(sub => sub.title).join(' ') || '') + ' ' + (section.activity ? activityTitles[section.activity] : '')).join(' ') + ' ' + (lesson.cases?.map(item => item.title).join(' ') || '')).toLowerCase().includes(needle))
-  return <main className="shell order-page course-overview page-enter" id="main-content" tabIndex={-1}>
+  const bodyResults = useMemo(() => needle ? searchBodyText(needle) : [], [needle])
+  const directoryMatches = useMemo(() => {
+    if (!needle) return lessons
+    return lessons.filter(lesson => {
+      const text = [
+        lesson.title, lesson.subtitle,
+        ...lesson.sections.map(section => section.title),
+        ...lesson.sections.flatMap(section => section.subsections?.map(sub => sub.title) || []),
+        ...(lesson.cases?.map(item => item.title) || []),
+        ...(lesson.readings?.map(item => item.title + ' ' + item.question) || []),
+        ...lesson.sections.map(section => section.activity ? activityTitles[section.activity] : '').filter(Boolean),
+      ].join(' ')
+      return matchesQuery(text, needle)
+    })
+  }, [needle])
+
+  return <main className="shell course-overview page-enter" id="main-content" tabIndex={-1}>
     <section className="order-intro">
       <div className="order-copy"><span className="context-label">国际金融课程</span><h1>国际金融学<br />课程读本</h1><a href={lessonHref('foundations')} className="primary-button">开始阅读<ArrowRight size={18} /></a></div>
       <figure className="order-image"><img src={import.meta.env.BASE_URL + 'assets/export-port.webp'} width="1440" height="810" alt="货轮停靠集装箱码头的教学情境示意图" /><figcaption>教学情境配图 · AI 生成</figcaption></figure>
     </section>
+    <CourseSidebar />
     <section className="course-directory" aria-labelledby="course-directory-title">
-      <div className="directory-heading"><h2 id="course-directory-title">课程内容</h2><label className="course-search"><Search size={17} /><span className="sr-only">查找专题</span><input type="search" placeholder="查找专题、理论或案例" value={query} onChange={event => setQuery(event.target.value)} />{query && <button aria-label="清除专题搜索" onClick={() => setQuery('')}><X size={15} /></button>}</label></div>
-      <div className="course-module-list">{courseModules.map(module => {
-        const items = matches.filter(lesson => lesson.moduleId === module.id)
-        if (!items.length) return null
-        return <section className="module-section" key={module.id}><div className="module-heading"><h3>{module.title}</h3><p>{module.description}</p></div><div className="module-lessons">{items.map(lesson => <a className="topic-link" href={lessonHref(lesson.id)} key={lesson.id}><div><h4>{lesson.title}</h4><p>{lesson.subtitle}</p></div><ArrowUpRight size={19} /></a>)}</div></section>
-      })}</div>
-      {matches.length === 0 && <div className="search-empty" role="status"><p>没有找到相关专题，请换一个课程术语。</p><button className="text-button" onClick={() => setQuery('')}>清除搜索</button></div>}
-      {needle && <p className="search-count" role="status">找到 {matches.length} 个专题</p>}
+      <div className="directory-heading"><h2 id="course-directory-title">课程内容</h2><label className="course-search"><Search size={17} /><span className="sr-only">查找专题</span><input type="search" placeholder="查找专题、理论、段落或关键词" value={query} onChange={event => setQuery(event.target.value)} />{query && <button aria-label="清除专题搜索" onClick={() => setQuery('')}><X size={15} /></button>}</label></div>
+      {needle ? (
+        bodyResults.length ? <SearchResults query={query} results={bodyResults} onClear={() => setQuery('')} /> :
+        directoryMatches.length ? <>
+          <p className="search-count" role="status">找到 {directoryMatches.length} 个专题</p>
+          <ModuleList modules={courseModules} lessons={directoryMatches} />
+        </> :
+        <div className="search-empty" role="status"><p>没有找到相关专题或段落，请换一个课程术语。</p><button className="text-button" onClick={() => setQuery('')}>清除搜索</button></div>
+      ) : (
+        <ModuleList modules={courseModules} lessons={lessons} />
+      )}
     </section>
   </main>
 }
