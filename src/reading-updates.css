@@ -1,4 +1,4 @@
-.rate-primary strong, .rate-secondary strong, .rate-change strong, .figure-readout, .figure-data td, .range-heading strong, .bridge-amount { font-family: var(--font-sans); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: 'zero' 0; }
+.rate-primary strong, .rate-secondary strong, .rate-change strong, .figure-readout, .figure-data td, .range-heading strong { font-family: var(--font-sans); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: 'zero' 0; }
 .rate-primary { column-gap: 10px; }
 .rate-primary strong { letter-spacing: -.015em; }
 .rate-primary small { font-size: 13px; line-height: 1; }

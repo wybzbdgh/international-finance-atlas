@@ -295,9 +295,5 @@ export default function WorldAtlas({ theme, visible }: { theme: 'dark' | 'light'
       </aside>
     </div>
     <div className="atlas-caption"><p>Frankfurter 每日参考价，非盘中实时价。报价单位为“目标货币／本币”；数值上升表示本币相对所选币种升值。30 日图层随目标币种切换，±0.5% 以内视为小幅变化，未取得报价的地区不比较涨跌；所选国家单独高亮。不同币种的参考日期可能不同。</p><a href="https://frankfurter.dev/" target="_blank" rel="noreferrer">数据说明<ArrowUpRight size={14} /></a></div>
-    <section className="map-to-order">
-      <div><h2>出口业务中的汇率风险</h2><p>一笔 10 万美元的出口货款，三个月后到账。人民币收入取决于收款日汇率和企业的套期安排。</p></div>
-      <a className="order-bridge" href="#learn/accounts"><span className="bridge-amount">$100,000<small>出口应收款</small></span><span className="bridge-arrow"><ArrowRight size={26} /></span><span className="bridge-question">国际收支<br />与汇率敞口</span></a>
-    </section>
   </main>
 }
