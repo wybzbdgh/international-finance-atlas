@@ -16,21 +16,6 @@ export function monthsBefore(date, months) {
   value.setUTCDate(Math.min(day, last));
   return value.toISOString().slice(0, 10);
 }
-export function replayTicks(today, range) {
-  const start =
-    range === "since2008"
-      ? "2008-01-01"
-      : monthsBefore(today, range === "five" ? 60 : 12);
-  const step = range === "year" ? 1 : range === "five" ? 3 : 12;
-  const ticks = [start];
-  for (let i = 1; i < 300; i++) {
-    const date = monthsBefore(start, -i * step);
-    if (date >= today) break;
-    ticks.push(date);
-  }
-  ticks.push(today);
-  return ticks;
-}
 export function nearestDateIndex(dates, date) {
   if (!dates.length) return -1;
   const target = Date.parse(date);
