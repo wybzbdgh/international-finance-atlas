@@ -28,6 +28,14 @@
 .theory-row-question { font: 15px/1.9 var(--font-serif); color: var(--body); margin-top: 10px; }
 .theory-reader { display: grid; grid-template-columns: 190px minmax(0, 760px); column-gap: 85px; justify-content: center; align-items: start; padding-block: 47px 80px; }
 .theory-reading-nav { position: sticky; top: 116px; max-height: calc(100dvh - 145px); overflow: auto; scrollbar-width: thin; }
+@media (min-width: 1024px) {
+  .theory-directory-layout.sidebar-collapsed { grid-template-columns: 44px minmax(0, 860px); }
+  .theory-reader.sidebar-collapsed { grid-template-columns: 44px minmax(0, 760px); }
+  .theory-directory-layout.sidebar-collapsed .theory-era-nav > :not(.sidebar-toggle),
+  .theory-reader.sidebar-collapsed .theory-reading-nav > :not(.sidebar-toggle) { opacity: 0; pointer-events: none; height: 0; overflow: hidden; margin: 0; }
+  .theory-directory-layout.sidebar-collapsed .theory-era-nav,
+  .theory-reader.sidebar-collapsed .theory-reading-nav { position: sticky; top: 116px; }
+}
 .theory-reading-nav nav { display: flex; flex-direction: column; gap: 5px; margin-bottom: 24px; }
 .theory-reading-nav nav button { padding: 8px 0; color: var(--muted); font-size: 12px; line-height: 1.8; text-align: left; }
 .theory-reading-nav nav button:hover { color: var(--accent); }
@@ -79,7 +87,7 @@
 @media (max-width: 1100px) { .theory-directory-layout { grid-template-columns: 190px minmax(0, 1fr); gap: 35px; } .theory-reader { grid-template-columns: 160px minmax(0, 1fr); gap: 40px; } .theory-row { grid-template-columns: 80px minmax(0, 1fr); gap: 20px; } }
 @media (max-width: 850px) {
   .theory-directory { padding-top: 35px; } .theory-directory-heading { margin-bottom: 28px; }
-  .theory-directory-layout, .theory-reader { grid-template-columns: minmax(0, 1fr); }
+  .theory-directory-layout, .theory-reader, .theory-directory-layout.sidebar-collapsed, .theory-reader.sidebar-collapsed { grid-template-columns: minmax(0, 1fr); }
   .theory-directory-tools { justify-content: flex-start; }
   .theory-era-nav { position: static; margin-bottom: 32px; }
   .theory-era-nav nav { flex-direction: row; overflow-x: auto; border-left: 0; border-bottom: 1px solid var(--line); scrollbar-width: thin; }
@@ -90,6 +98,8 @@
   .theory-reading-nav { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
   .theory-return { border-top: 0; padding: 0; }
   .theory-reader { padding-top: 27px; gap: 0; }
+  .theory-directory-layout.sidebar-collapsed .theory-era-nav > :not(.sidebar-toggle),
+  .theory-reader.sidebar-collapsed .theory-reading-nav > :not(.sidebar-toggle) { opacity: 1; pointer-events: auto; height: auto; overflow: visible; }
 }
 @media (max-width: 600px) {
   .theory-directory-heading { display: block; } .theory-directory-heading p { margin-top: 10px; font-size: 14px; }
