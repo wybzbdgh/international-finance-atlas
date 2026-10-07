@@ -52,7 +52,8 @@ CSS 都在 `src/`：
 - `reading-updates.css`：课程正文、目录和随文交互。
 - `figure-updates.css`：图表及图表控件。
 - `theory.css`：理论目录和理论文章。
-- `atlas-updates.css`：汇率地图、报价、时间回放和货币比较。
+- `atlas-updates.css`：汇率地图、报价和货币比较。
+- `date-range.css`：货币比较的自定义时间弹窗；交互在 `src/components/DateRangePicker.js` 中。
 
 中文字体文件在 `src/assets/fonts/`。思源宋体负责阅读文字，思源黑体与 Inter 负责界面、数字。新增文字较多时，按该目录的 README 更新字体子集。
 

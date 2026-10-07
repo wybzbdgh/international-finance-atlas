@@ -6,7 +6,6 @@ import {
   nearestDateIndex,
   normalizeComparison,
   pairSeries,
-  replayTicks,
   shiftDate,
   snapshotFromRows,
 } from "../src/lib/atlas-models.js";
@@ -107,16 +106,12 @@ test("snapshot retains currency observation dates and rejects invalid or non-USD
     JPY: "2026-01-01",
   });
 });
-test("replay ticks remain ordered through leap dates and month ends", () => {
+test("calendar offsets respect leap dates and month ends", () => {
   assert.equal(monthsBefore("2024-03-31", 1), "2024-02-29");
   assert.equal(monthsBefore("2025-03-31", 1), "2025-02-28");
   assert.equal(shiftDate("2024-03-01", -1), "2024-02-29");
-  for (const range of ["year", "five", "since2008"]) {
-    const dates = replayTicks("2026-10-03", range);
-    assert.equal(dates.at(-1), "2026-10-03");
-    assert.ok(dates.every((date, i) => !i || date > dates[i - 1]));
-    assert.equal(nearestDateIndex(dates, "2026-10-03"), dates.length - 1);
-  }
+  assert.equal(monthsBefore("2024-02-29", 120), "2014-02-28");
+  assert.equal(nearestDateIndex(["2024-02-28", "2024-03-01"], "2024-03-02"), 1);
 });
 test("dated currency mapping separates predecessor and successor units", () => {
   for (const [iso, before, after, date] of [

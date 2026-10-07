@@ -24,15 +24,8 @@ import {
   fmtRate,
 } from "../map-data.js";
 import { normalizeComparison, nearestDateIndex } from "../lib/atlas-models.js";
-export const rangeLabels = {
-  30: "1 个月",
-  90: "3 个月",
-  365: "1 年",
-  1826: "5 年",
-};
-export const RangePicker = view(function RangePicker({ value, onChange }) {
-  return markup`<div class="atlas-range-picker" role="group" aria-label="走势图范围">${renderContent([30, 90, 365, 1826].map((range) => markup`<button type="button" aria-pressed=${ifDefined(range === value)} @click=${() => onChange(range)}>${renderContent(rangeLabels[range])}</button>`))}</div>`;
-});
+export { rangeLabels } from "../lib/date-range.js";
+import DateRangePicker from "./DateRangePicker.js";
 function keyboardIndex(event, active, length) {
   let value;
   if (event.key === "ArrowRight") value = Math.min(active + 1, length - 1);
@@ -86,8 +79,11 @@ const CurrencyComparison = view(function CurrencyComparison({
   choices,
   quote,
   date,
+  today,
+  period,
   range,
   onRange,
+  onCustomRange,
   onRemove,
   onAdd,
   canAdd,
@@ -110,6 +106,7 @@ const CurrencyComparison = view(function CurrencyComparison({
     [rows, choices, quote, date],
   );
   const [active, setActive] = viewState(null);
+  afterRender(() => setActive(null), [rows, quote, choices]);
   const plotRef = keepRef(null),
     [compact, setCompact] = viewState(false);
   afterRender(() => {
@@ -145,10 +142,13 @@ const CurrencyComparison = view(function CurrencyComparison({
   const x = (date) =>
     left + ((Date.parse(date) - start) / (end - start || 1)) * (right - left);
   const y = (value) => 286 - ((value - min) / (max - min)) * 248;
-  return markup`<section class="atlas-comparison" aria-labelledby="atlas-comparison-title"><div class="atlas-comparison-heading"><div><h2 id="atlas-comparison-title">货币走势比较</h2><p>统一兑${renderContent(currencyName(quote))}，共同起点为 100。</p></div>${RangePicker(
+  return markup`<section class="atlas-comparison" aria-labelledby="atlas-comparison-title"><div class="atlas-comparison-heading"><div><h2 id="atlas-comparison-title">货币走势比较</h2><p>统一兑${renderContent(currencyName(quote))}，共同起点为 100。</p></div>${DateRangePicker(
     {
-      value: range,
-      onChange: onRange,
+      today,
+      range,
+      period,
+      onRange,
+      onCustomRange,
     },
   )}</div><div class="atlas-comparison-layout"><div class="atlas-comparison-list">${renderContent(
     choices.map((choice, i) => {
@@ -166,40 +166,37 @@ const CurrencyComparison = view(function CurrencyComparison({
       size: 16,
     },
   )}加入当前国家的货币</button><p class="comparison-help">可比较四种货币。点选地图上的国家后加入。</p></div><div class=${ifDefined("atlas-comparison-plot" + (compact ? " is-compact" : ""))} ${elementRef(plotRef)} aria-busy=${ifDefined(status === "loading")}>${renderContent(
-    status === "replaying"
-      ? markup`<div class="atlas-series-empty"><p>暂停回放后，比较这一日期前的货币走势。</p></div>`
-      : status === "loading"
-        ? markup`<div class="atlas-series-loading skeleton" role="status">正在读取历史数据</div>`
-        : status === "error"
-          ? markup`<div class="atlas-series-empty"><p>历史数据暂时无法连接。</p><button class="text-button" @click=${onRetry}>重新读取${ArrowUpRight(
-              {
-                size: 14,
-              },
-            )}</button></div>`
-          : dates.length < 2
-            ? markup`<div class="atlas-series-empty"><p>${renderContent(choices.length ? "所选币种在这一期间没有足够的共同数据。" : "从地图选择国家，加入想比较的货币。")}</p></div>`
-            : markup`<div class="comparison-observation"><time>${renderContent(dates[index])}</time><span>共同起点 ${renderContent(comparison.start)}</span></div><svg viewBox=${ifDefined("0 0 " + width + " 330")} role="slider" tabindex="0" aria-label="货币比较走势图，左右方向键选择日期" aria-valuemin="0" aria-valuemax=${ifDefined(dates.length - 1)} aria-valuenow=${ifDefined(index)} aria-valuetext=${ifDefined(dates[index] + "，" + comparison.series.map((item) => item.code + "指数" + item.points[index].value.toFixed(2)).join("，"))} @pointerdown=${(event) => setActive(pointerIndex(event, dates, left, right, width))} @pointermove=${(event) => setActive(pointerIndex(event, dates, left, right, width))} @keydown=${(
-                event,
-              ) => {
-                const value = keyboardIndex(event, index, dates.length);
-                if (value !== undefined) setActive(value);
-              }}>${renderContent(
-                Array.from(
-                  {
-                    length: 5,
-                  },
-                  (_, i) => min + ((max - min) * i) / 4,
-                ).map(
-                  (value) =>
-                    svgMarkup`<g><line x1=${ifDefined(left)} x2=${ifDefined(right)} y1=${ifDefined(y(value))} y2=${ifDefined(y(value))} class="chart-grid"></line><text x=${ifDefined(left - 10)} y=${ifDefined(y(value) + 4)} text-anchor="end">${renderContent(
-                      new Intl.NumberFormat("zh-CN", {
-                        notation: value >= 1000 ? "compact" : "standard",
-                        maximumFractionDigits:
-                          value >= 1000 ? 1 : tickPrecision,
-                      }).format(value),
-                    )}</text></g>`,
-                ),
-              )}<line x1=${ifDefined(left)} x2=${ifDefined(right)} y1=${ifDefined(y(100))} y2=${ifDefined(y(100))} class="atlas-baseline"></line>${renderContent(comparison.series.map((item, i) => svgMarkup`<g class=${ifDefined("currency-line-" + choices.findIndex((choice) => choice.code === item.code))}><polyline points=${ifDefined(item.points.map((point) => x(point.date) + "," + y(point.value)).join(" "))} fill="none" vector-effect="non-scaling-stroke" class="comparison-line" stroke-dasharray=${ifDefined(i === 3 ? "4 3" : undefined)}></polyline><circle cx=${ifDefined(x(item.points[index].date))} cy=${ifDefined(y(item.points[index].value))} r="4" class="comparison-dot"></circle></g>`))}<line x1=${ifDefined(x(dates[index]))} x2=${ifDefined(x(dates[index]))} y1="26" y2="286" class="atlas-crosshair"></line><text x=${ifDefined(left)} y="318">${renderContent(dates[0])}</text><text x=${ifDefined(right)} y="318" text-anchor="end">${renderContent(dates.at(-1))}</text></svg><p class="comparison-axis-note">数值上升表示相对${renderContent(currencyName(quote))}升值。移到曲线上查看读数，方向键也可选择日期。</p>`,
+    status === "loading"
+      ? markup`<div class="atlas-series-loading skeleton" role="status">正在读取历史数据</div>`
+      : status === "error"
+        ? markup`<div class="atlas-series-empty"><p>历史数据暂时无法连接。</p><button class="text-button" @click=${onRetry}>重新读取${ArrowUpRight(
+            {
+              size: 14,
+            },
+          )}</button></div>`
+        : dates.length < 2
+          ? markup`<div class="atlas-series-empty"><p>${renderContent(choices.length ? "所选币种在这一期间没有足够的共同数据。" : "从地图选择国家，加入想比较的货币。")}</p></div>`
+          : markup`<div class="comparison-observation"><time>${renderContent(dates[index])}</time></div><svg viewBox=${ifDefined("0 0 " + width + " 330")} role="slider" tabindex="0" aria-label="货币比较走势图，左右方向键选择日期" aria-valuemin="0" aria-valuemax=${ifDefined(dates.length - 1)} aria-valuenow=${ifDefined(index)} aria-valuetext=${ifDefined(dates[index] + "，" + comparison.series.map((item) => item.code + "指数" + item.points[index].value.toFixed(2)).join("，"))} @pointerdown=${(event) => setActive(pointerIndex(event, dates, left, right, width))} @pointermove=${(event) => setActive(pointerIndex(event, dates, left, right, width))} @keydown=${(
+              event,
+            ) => {
+              const value = keyboardIndex(event, index, dates.length);
+              if (value !== undefined) setActive(value);
+            }}>${renderContent(
+              Array.from(
+                {
+                  length: 5,
+                },
+                (_, i) => min + ((max - min) * i) / 4,
+              ).map(
+                (value) =>
+                  svgMarkup`<g><line x1=${ifDefined(left)} x2=${ifDefined(right)} y1=${ifDefined(y(value))} y2=${ifDefined(y(value))} class="chart-grid"></line><text x=${ifDefined(left - 10)} y=${ifDefined(y(value) + 4)} text-anchor="end">${renderContent(
+                    new Intl.NumberFormat("zh-CN", {
+                      notation: value >= 1000 ? "compact" : "standard",
+                      maximumFractionDigits: value >= 1000 ? 1 : tickPrecision,
+                    }).format(value),
+                  )}</text></g>`,
+              ),
+            )}<line x1=${ifDefined(left)} x2=${ifDefined(right)} y1=${ifDefined(y(100))} y2=${ifDefined(y(100))} class="atlas-baseline"></line>${renderContent(comparison.series.map((item, i) => svgMarkup`<g class=${ifDefined("currency-line-" + choices.findIndex((choice) => choice.code === item.code))}><polyline points=${ifDefined(item.points.map((point) => x(point.date) + "," + y(point.value)).join(" "))} fill="none" vector-effect="non-scaling-stroke" class="comparison-line" stroke-dasharray=${ifDefined(i === 3 ? "4 3" : undefined)}></polyline><circle cx=${ifDefined(x(item.points[index].date))} cy=${ifDefined(y(item.points[index].value))} r="4" class="comparison-dot"></circle></g>`))}<line x1=${ifDefined(x(dates[index]))} x2=${ifDefined(x(dates[index]))} y1="26" y2="286" class="atlas-crosshair"></line><text x=${ifDefined(left)} y="318">${renderContent(dates[0])}</text><text x=${ifDefined(right)} y="318" text-anchor="end">${renderContent(dates.at(-1))}</text></svg>`,
   )}${renderContent(status === "ready" && comparison.missing.length > 0 && markup`<p class="comparison-missing">缺少共同历史数据：${renderContent(comparison.missing.map(currencyName).join("、"))}。</p>`)}</div></div></section>`;
 });
 export default CurrencyComparison;
