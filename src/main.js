@@ -97,7 +97,8 @@ function readRoute() {
     const [, id, section] = hash.split("/");
     return { page: "learn", id: lessonById(id)?.id, section };
   }
-  return { page: "map" };
+  if (hash === "map") return { page: "map" };
+  return { page: "home" };
 }
 function updateMap(visible) {
   if (mapView)
@@ -141,6 +142,57 @@ async function loadPage(path) {
         }),
     );
   return pageCache.get(path);
+}
+
+function bindHome(root) {
+  // Home page links use standard hash navigation; no extra binding required.
+}
+
+function bindSidebarToggle(root) {
+  const sidebar = root.querySelector(
+    ".lesson-nav, .course-nav, .theory-era-nav, .theory-reading-nav",
+  );
+  if (!sidebar) return;
+
+  let pageRoot;
+  if (root.classList.contains("reader-page") ||
+      root.classList.contains("course-overview")) {
+    pageRoot = root;
+  } else if (root.classList.contains("theory-directory")) {
+    pageRoot = root.querySelector(".theory-directory-layout");
+  } else if (root.classList.contains("theory-reader")) {
+    pageRoot = root;
+  }
+  if (!pageRoot) return;
+
+  const storageKey = "finance-atlas-sidebar-collapsed";
+  const toggle = document.createElement("button");
+  toggle.className = "sidebar-toggle";
+  toggle.setAttribute("aria-label", "收起侧边栏");
+  toggle.setAttribute("aria-expanded", "true");
+  render(Menu({ size: 18 }), toggle);
+
+  toggle.addEventListener("click", () => {
+    const collapsed = pageRoot.classList.toggle("sidebar-collapsed");
+    toggle.setAttribute("aria-expanded", String(!collapsed));
+    toggle.setAttribute(
+      "aria-label",
+      collapsed ? "展开侧边栏" : "收起侧边栏",
+    );
+    try {
+      sessionStorage.setItem(storageKey, String(collapsed));
+    } catch {}
+  });
+
+  sidebar.prepend(toggle);
+
+  try {
+    if (sessionStorage.getItem(storageKey) === "true") {
+      pageRoot.classList.add("sidebar-collapsed");
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", "展开侧边栏");
+    }
+  } catch {}
 }
 
 function bindCourseDirectory(root) {
@@ -448,6 +500,7 @@ async function navigate() {
       link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   });
+  document.body.classList.toggle("home-route", route.page === "home");
   const routeKey = route.page + "/" + (route.id || "");
   const selector =
     route.page === "map"
@@ -456,9 +509,11 @@ async function navigate() {
         ? route.id
           ? ".theory-reader"
           : ".theory-directory"
-        : route.id
-          ? ".reader-page"
-          : ".course-overview";
+        : route.page === "home"
+          ? ".home-landing"
+          : route.id
+            ? ".reader-page"
+            : ".course-overview";
   const section = ["cases", "readings", "theories"].includes(route.section)
     ? "topic-" + route.section
     : route.section;
@@ -481,7 +536,9 @@ async function navigate() {
         ? theory?.title || "理论深思"
         : route.page === "learn"
           ? "课程读本"
-          : "全球汇率")) + " · 国际金融";
+          : route.page === "home"
+            ? "国际金融课程"
+            : "全球汇率")) + " · 国际金融";
   try {
     if (route.page === "map") {
       if (!mapView)
@@ -497,13 +554,17 @@ async function navigate() {
         readingSlot.innerHTML =
           '<main class="shell theory-loading" id="main-content" aria-busy="true"><h1>理论深思</h1><p role="status">正在打开文章…</p></main>';
       const text = await loadPage(
-        (route.page === "learn" ? "course/" : "theory/") +
-          (route.id || "index"),
+        route.page === "home"
+          ? "home/index"
+          : (route.page === "learn" ? "course/" : "theory/") +
+              (route.id || "index"),
       );
       if (version !== routeVersion) return;
       readingSlot.innerHTML = text.replaceAll("__BASE__", base);
       const root = readingSlot.querySelector("main");
-      if (route.page === "learn") {
+      if (route.page === "home") {
+        bindHome(root);
+      } else if (route.page === "learn") {
         if (lesson) bindLesson(root, lesson);
         else bindCourseDirectory(root);
       } else if (theory) bindTheoryArticle(root, theory.id);
@@ -511,6 +572,7 @@ async function navigate() {
       await bindFigures(root, version);
     }
     if (version !== routeVersion) return;
+    bindSidebarToggle(root);
     mountedRoute = routeKey;
     restore = restoreReadingPosition(window.location.hash, selector, section);
   } catch (error) {

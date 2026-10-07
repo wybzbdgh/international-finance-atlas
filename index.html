@@ -22,90 +22,97 @@
   <body
     ><div id="root"
       ><a class="skip-link" href="#main-content">跳到主要内容</a
+      ><svg class="brand-filter" aria-hidden="true" width="0" height="0">
+        <defs>
+          <filter
+            id="guanghua-white"
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            color-interpolation-filters="sRGB"
+          >
+            <feColorMatrix
+              type="matrix"
+              values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 -1 0 0 1"
+            ></feColorMatrix>
+            <feComposite in2="SourceAlpha" operator="in"></feComposite>
+          </filter>
+        </defs></svg
       ><header class="site-header"
         ><div class="header-inner shell"
-          ><a class="brand" href="#map" aria-label="光华管理学院，回到全球汇率"
-            ><svg class="brand-filter" aria-hidden="true" width="0" height="0">
-              <defs>
-                <filter
-                  id="guanghua-white"
-                  x="0"
-                  y="0"
-                  width="100%"
-                  height="100%"
-                  color-interpolation-filters="sRGB"
+          ><div class="header-top"
+            ><a class="brand-text" href="#home" aria-label="国际金融，回到首页"
+              ><span class="brand-zh">国际金融</span
+              ><span class="brand-en">International Finance</span></a
+            ><div class="header-actions"
+              ><button
+                class="icon-button theme-toggle"
+                aria-label="切换为日间阅读"
+                title="日间阅读"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="19"
+                  height="19"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-sun"
                 >
-                  <feColorMatrix
-                    type="matrix"
-                    values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 -1 0 0 1"
-                  ></feColorMatrix>
-                  <feComposite in2="SourceAlpha" operator="in"></feComposite>
-                </filter>
-              </defs></svg
-            ><img
-              class="guanghua-logo"
-              alt="北京大学光华管理学院"
-              width="442"
-              height="96"
-              src="/assets/guanghua-original.png" /></a
+                  <circle cx="12" cy="12" r="4"></circle>
+                  <path d="M12 2v2"></path>
+                  <path d="M12 20v2"></path>
+                  <path d="m4.93 4.93 1.41 1.41"></path>
+                  <path d="m17.66 17.66 1.41 1.41"></path>
+                  <path d="M2 12h2"></path>
+                  <path d="M20 12h2"></path>
+                  <path d="m6.34 17.66-1.41 1.41"></path>
+                  <path d="m19.07 4.93-1.41 1.41"></path></svg></button
+              ><button
+                class="icon-button mobile-menu"
+                aria-label="打开导航"
+                aria-expanded="false"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="21"
+                  height="21"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-menu"
+                >
+                  <line x1="4" x2="20" y1="12" y2="12"></line>
+                  <line x1="4" x2="20" y1="6" y2="6"></line>
+                  <line
+                    x1="4"
+                    x2="20"
+                    y1="18"
+                    y2="18"
+                  ></line></svg></button></div></div
           ><nav class="main-nav" aria-label="主导航"
             ><a href="#map">全球汇率</a
-            ><a href="#learn" aria-current="page">课程读本</a
+            ><a href="#learn">课程读本</a
             ><a href="#theory">理论深思</a></nav
-          ><div class="header-actions"
-            ><button
-              class="icon-button theme-toggle"
-              aria-label="切换为日间阅读"
-              title="日间阅读"
-              ><svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="19"
-                height="19"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="lucide lucide-sun"
-              >
-                <circle cx="12" cy="12" r="4"></circle>
-                <path d="M12 2v2"></path>
-                <path d="M12 20v2"></path>
-                <path d="m4.93 4.93 1.41 1.41"></path>
-                <path d="m17.66 17.66 1.41 1.41"></path>
-                <path d="M2 12h2"></path>
-                <path d="M20 12h2"></path>
-                <path d="m6.34 17.66-1.41 1.41"></path>
-                <path d="m19.07 4.93-1.41 1.41"></path></svg></button
-            ><button
-              class="icon-button mobile-menu"
-              aria-label="打开导航"
-              aria-expanded="false"
-              ><svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="21"
-                height="21"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="lucide lucide-menu"
-              >
-                <line x1="4" x2="20" y1="12" y2="12"></line>
-                <line x1="4" x2="20" y1="6" y2="6"></line>
-                <line
-                  x1="4"
-                  x2="20"
-                  y1="18"
-                  y2="18"
-                ></line></svg></button></div></div></header
+          ></div></header
       ><template id="map-marker"></template
       ><div id="reading-slot" style="display: contents"></div
       ><footer class="site-footer"
-        ><div class="shell"
+        ><div class="shell footer-inner"
+          ><img
+            class="guanghua-logo footer-logo"
+            alt="北京大学光华管理学院"
+            width="442"
+            height="96"
+            src="/assets/guanghua-original.png"
+          />
+          <p class="footer-copyright"
+            >© 2026 北京大学光华管理学院 · 国际金融课程</p
           ><div class="footer-sources"
             ><a href="https://frankfurter.dev/" target="_blank" rel="noreferrer"
               >Frankfurter</a
