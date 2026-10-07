@@ -1,0 +1,677 @@
+<!-- 编辑此文件中的标题、段落和链接。交互挂载点的 data-view/data-props 请保留。 -->
+<main
+  class="shell theory-reader page-enter"
+  id="main-content"
+  tabindex="-1"
+  data-theory="interest-parity"
+  ><aside class="theory-reading-nav"
+    ><a href="#theory" class="back-link"
+      ><svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="lucide lucide-arrow-left"
+      >
+        <path d="m12 19-7-7 7-7"></path>
+        <path d="M19 12H5"></path></svg
+      >年代目录</a
+    ><nav aria-label="本篇内容"
+      ><button>原文选读</button><button>远期市场解决什么问题</button
+      ><button>把两条投资路径放在同一日期</button><button>升贴水抵消利差</button
+      ><button>抛补与未抛补不是同一个条件</button
+      ><button>为什么现实会出现基差</button
+      ><button>从具体报价重建套利路径</button><button>公式与变量</button
+      ><button>模型图表</button><button>原著与参考文献</button></nav
+    ></aside
+  ><article class="theory-article"
+    ><header class="theory-article-heading"
+      ><div class="theory-bibliography-line"
+        ><time>1923 · 系统论述</time><span>理论</span></div
+      ><h1>凯恩斯：远期外汇与利率平价</h1
+      ><p class="theory-authors">John Maynard Keynes</p
+      ><p class="theory-original-title">A Tract on Monetary Reform</p
+      ><p class="theory-question"
+        >换汇、存款再用远期锁定汇率，能够稳定多赚一份利差吗？</p
+      ></header
+    ><section class="theory-original-reading" id="theory-original"
+      ><div class="theory-section-heading"
+        ><h2>原文选读</h2
+        ><div class="original-language" role="group" aria-label="原文显示方式"
+          ><button aria-pressed="true">对照</button
+          ><button aria-pressed="false">原文</button
+          ><button aria-pressed="false">译文</button></div
+        ></div
+      ><div class="theory-excerpt"
+        ><blockquote
+          ><p lang="en"
+            >is by no means unlimited in amount, and is not always adequate to
+            the market’s requirements.</p
+          ></blockquote
+        ><p class="theory-translation"
+          ><span>本站译文</span
+          >（这种流动资本）在数量上绝非无限，也并不总能满足市场需要。</p
+        ><a
+          class="theory-source-link"
+          href="https://www.gutenberg.org/ebooks/65278"
+          target="_blank"
+          rel="noreferrer"
+          >A Tract on Monetary Reform · 全文<svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-arrow-up-right"
+          >
+            <path d="M7 7h10v10"></path>
+            <path d="M7 17 17 7"></path></svg></a></div></section
+    ><section class="prose-section" id="theory-section-0"
+      ><h2>远期市场解决什么问题</h2
+      ><p id="interest-parity-p-0-0" data-reading-anchor="true"
+        >《货币改革论》讨论战后即期与远期外汇市场。进出口商常在今天确定合同，却在未来收付款；他们需要事先锁定兑换价格。投资者也可将即期换汇、外国存款与远期卖出外币组合起来。利率平价已有市场实践和更早论述，1923
+        年是凯恩斯对这一机制作系统说明的代表时间，不应写成作者首次发明远期外汇。</p
+      ></section
+    ><section class="prose-section" id="theory-section-1"
+      ><h2>把两条投资路径放在同一日期</h2
+      ><p id="interest-parity-p-1-0" data-reading-anchor="true"
+        >从一单位本币出发，直接存入本国银行，到期得到 1+i。另一条路径是按 E 换成
+        1/E 单位外币，存款后得到 (1+i*)/E，再按今天约定的远期汇率 F
+        换回本币，最终得到
+        F(1+i*)/E。在期限、信用风险和交易条件相同且无成本时，两条确定收益路径必须相等，才不存在可以重复扩大的套利。</p
+      ></section
+    ><section class="prose-section" id="theory-section-2"
+      ><h2>升贴水抵消利差</h2
+      ><p id="interest-parity-p-2-0" data-reading-anchor="true"
+        >由两条路径相等可得
+        F/E=(1+i)/(1+i*)。若本币利率较高，直接标价的远期汇率通常也较高，即外币远期升水、本币远期贴水。它抵消将低息外币借入后换成本币投资的利差。报价方向非常重要：把本币/外币改为外币/本币后，公式和升贴水说法都要相应转换。还应将年利率换算到实际合同期限，不能把三个月远期点数直接与一年利差比较。</p
+      ></section
+    ><section class="prose-section" id="theory-section-3"
+      ><h2>抛补与未抛补不是同一个条件</h2
+      ><p id="interest-parity-p-3-0" data-reading-anchor="true"
+        >抛补利率平价使用已签约的
+        F，未来兑换金额可以锁定。未抛补利率平价使用预期未来即期汇率，未来损益仍然不确定，还需要风险偏好或风险溢价假设。远期汇率满足无套利关系，不等于它必然是未来即期汇率的无偏预测。高息货币的套息收益，也不能只凭一次盈利就被解释为无风险套利。</p
+      ></section
+    ><section class="prose-section" id="theory-section-4"
+      ><h2>为什么现实会出现基差</h2
+      ><p id="interest-parity-p-4-0" data-reading-anchor="true"
+        >凯恩斯已注意到可用于套利的流动资本有限。今天还需考察买卖价差、借贷利率差、保证金、银行资本、资产负债表成本和交易对手风险。观察到报价偏离教科书平价，应先用实际能成交的借款、存款和远期价格重算。有些偏离反映对冲需求与金融中介约束，它们可以持续存在，并成为研究跨境美元融资的资料。</p
+      ></section
+    ><section class="prose-section" id="theory-section-5"
+      ><h2>从具体报价重建套利路径</h2
+      ><p id="interest-parity-p-5-0" data-reading-anchor="true"
+        >设本币一年利率为 2%，美元一年利率为 5%，即期汇率为 7.20
+        本币/美元。无摩擦条件下，远期汇率应为 7.20×1.02/1.05，约
+        6.994。本币利率较低，美元远期贴水与美元的利率优势相抵。这个价格由今天的可交易条件决定，并未使用分析者对一年后即期汇率的判断。</p
+      ><p id="interest-parity-p-5-1" data-reading-anchor="true"
+        >若同期限远期报价为 6.90，可以设想借入 100 万美元，即期换得 720
+        万本币并按 2% 投资，到期得到 734.4 万本币。美元债务到期是 105
+        万美元，事先按 6.90 买入这些美元只需 724.5 万本币，两个终值相差 9.9
+        万本币。讲义用同一方向的放大金额展示这条路径；实际交易还须用借款利率、存款利率及对应买卖价分别核算。</p
+      ><p id="interest-parity-p-5-2" data-reading-anchor="true"
+        >若加入费用后差额仍为正，还需要确认能否借到指定币种、能否取得同期限授信，以及远期对手方是否履约。CIP
+        因而既是计算工具，也是检查报价口径的顺序：先统一到期日，再统一计价货币，最后扣除实际可发生的成本。预期汇率只参与没有远期锁定的另一类投资，不能被放入这条已锁定现金流来重复计算收益。还应检查报价是否年化、采用多少计息天数；同样标为三个月的交易，在起息日或结算日不同时并不是完全相同的现金流。</p
+      ></section
+    ><section class="theory-derivation" id="theory-derivation"
+      ><h2>公式与变量</h2
+      ><div class="reading-formula"
+        ><div class="math-expression"
+          ><span class="katex-display"
+            ><span class="katex"
+              ><span class="katex-mathml"
+                ><math
+                  xmlns="http://www.w3.org/1998/Math/MathML"
+                  display="block"
+                  ><semantics
+                    ><mrow
+                      ><mn>1</mn><mo>+</mo><mi>i</mi><mo>=</mo
+                      ><mfrac><mi>F</mi><mi>E</mi></mfrac
+                      ><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo
+                      ><msup
+                        ><mi>i</mi><mo lspace="0em" rspace="0em">∗</mo></msup
+                      ><mo stretchy="false">)</mo></mrow
+                    ><annotation encoding="application/x-tex"
+                      >1+i=\frac{F}{E}(1+i^{*})</annotation
+                    ></semantics
+                  ></math
+                ></span
+              ><span class="katex-html" aria-hidden="true"
+                ><span class="katex-base"
+                  ><span
+                    class="katex-strut"
+                    style="height: 0.7278em; vertical-align: -0.0833em"
+                  ></span
+                  ><span class="mord">1</span
+                  ><span class="mspace" style="margin-right: 0.2222em"></span
+                  ><span class="mbin">+</span
+                  ><span
+                    class="mspace"
+                    style="margin-right: 0.2222em"
+                  ></span></span
+                ><span class="katex-base"
+                  ><span class="katex-strut" style="height: 0.6595em"></span
+                  ><span class="mord mathnormal">i</span
+                  ><span class="mspace" style="margin-right: 0.2778em"></span
+                  ><span class="mrel">=</span
+                  ><span
+                    class="mspace"
+                    style="margin-right: 0.2778em"
+                  ></span></span
+                ><span class="katex-base"
+                  ><span
+                    class="katex-strut"
+                    style="height: 2.0463em; vertical-align: -0.686em"
+                  ></span
+                  ><span class="mord"
+                    ><span class="mopen nulldelimiter"></span
+                    ><span class="mfrac"
+                      ><span class="vlist-t vlist-t2"
+                        ><span class="vlist-r"
+                          ><span class="vlist" style="height: 1.3603em"
+                            ><span style="top: -2.314em"
+                              ><span class="pstrut" style="height: 3em"></span
+                              ><span class="mord"
+                                ><span
+                                  class="mord mathnormal"
+                                  style="margin-right: 0.0576em"
+                                  >E</span
+                                ></span
+                              ></span
+                            ><span style="top: -3.23em"
+                              ><span class="pstrut" style="height: 3em"></span
+                              ><span
+                                class="frac-line"
+                                style="border-bottom-width: 0.04em"
+                              ></span></span
+                            ><span style="top: -3.677em"
+                              ><span class="pstrut" style="height: 3em"></span
+                              ><span class="mord"
+                                ><span
+                                  class="mord mathnormal"
+                                  style="margin-right: 0.1389em"
+                                  >F</span
+                                ></span
+                              ></span
+                            ></span
+                          ><span class="vlist-s">​</span></span
+                        ><span class="vlist-r"
+                          ><span class="vlist" style="height: 0.686em"
+                            ><span></span></span></span></span></span
+                    ><span class="mclose nulldelimiter"></span></span
+                  ><span class="mopen">(</span><span class="mord">1</span
+                  ><span class="mspace" style="margin-right: 0.2222em"></span
+                  ><span class="mbin">+</span
+                  ><span
+                    class="mspace"
+                    style="margin-right: 0.2222em"
+                  ></span></span
+                ><span class="katex-base"
+                  ><span
+                    class="katex-strut"
+                    style="height: 1em; vertical-align: -0.25em"
+                  ></span
+                  ><span class="mord"
+                    ><span class="mord mathnormal">i</span
+                    ><span class="msupsub"
+                      ><span class="vlist-t"
+                        ><span class="vlist-r"
+                          ><span class="vlist" style="height: 0.7387em"
+                            ><span style="top: -3.113em; margin-right: 0.05em"
+                              ><span class="pstrut" style="height: 2.7em"></span
+                              ><span
+                                class="katex-sizing reset-size6 size3 mtight"
+                                ><span class="mord mtight"
+                                  ><span class="mord mtight">∗</span></span
+                                ></span
+                              ></span
+                            ></span
+                          ></span
+                        ></span
+                      ></span
+                    ></span
+                  ><span class="mclose">)</span></span
+                ></span
+              ></span
+            ></span
+          ></div
+        ><p
+          >抛补利率平价；E 和 F
+          均为每单位外币的本币价格，利率与合同期限一致。</p
+        ></div
+      ><div class="reading-formula"
+        ><div class="math-expression"
+          ><span class="katex-display"
+            ><span class="katex"
+              ><span class="katex-mathml"
+                ><math
+                  xmlns="http://www.w3.org/1998/Math/MathML"
+                  display="block"
+                  ><semantics
+                    ><mrow
+                      ><mn>1</mn><mo>+</mo><mi>i</mi><mo>=</mo
+                      ><mfrac
+                        ><mrow
+                          ><msub
+                            ><mi mathvariant="double-struck">E</mi
+                            ><mi>t</mi></msub
+                          ><mo stretchy="false">[</mo
+                          ><msub
+                            ><mi>E</mi
+                            ><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub
+                          ><mo stretchy="false">]</mo></mrow
+                        ><msub><mi>E</mi><mi>t</mi></msub></mfrac
+                      ><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo
+                      ><msup
+                        ><mi>i</mi><mo lspace="0em" rspace="0em">∗</mo></msup
+                      ><mo stretchy="false">)</mo></mrow
+                    ><annotation encoding="application/x-tex"
+                      >1+i=\frac{\mathbb{E}_t[E_{t+1}]}{E_t}(1+i^{*})</annotation
+                    ></semantics
+                  ></math
+                ></span
+              ><span class="katex-html" aria-hidden="true"
+                ><span class="katex-base"
+                  ><span
+                    class="katex-strut"
+                    style="height: 0.7278em; vertical-align: -0.0833em"
+                  ></span
+                  ><span class="mord">1</span
+                  ><span class="mspace" style="margin-right: 0.2222em"></span
+                  ><span class="mbin">+</span
+                  ><span
+                    class="mspace"
+                    style="margin-right: 0.2222em"
+                  ></span></span
+                ><span class="katex-base"
+                  ><span class="katex-strut" style="height: 0.6595em"></span
+                  ><span class="mord mathnormal">i</span
+                  ><span class="mspace" style="margin-right: 0.2778em"></span
+                  ><span class="mrel">=</span
+                  ><span
+                    class="mspace"
+                    style="margin-right: 0.2778em"
+                  ></span></span
+                ><span class="katex-base"
+                  ><span
+                    class="katex-strut"
+                    style="height: 2.263em; vertical-align: -0.836em"
+                  ></span
+                  ><span class="mord"
+                    ><span class="mopen nulldelimiter"></span
+                    ><span class="mfrac"
+                      ><span class="vlist-t vlist-t2"
+                        ><span class="vlist-r"
+                          ><span class="vlist" style="height: 1.427em"
+                            ><span style="top: -2.314em"
+                              ><span class="pstrut" style="height: 3em"></span
+                              ><span class="mord"
+                                ><span class="mord"
+                                  ><span
+                                    class="mord mathnormal"
+                                    style="margin-right: 0.0576em"
+                                    >E</span
+                                  ><span class="msupsub"
+                                    ><span class="vlist-t vlist-t2"
+                                      ><span class="vlist-r"
+                                        ><span
+                                          class="vlist"
+                                          style="height: 0.2806em"
+                                          ><span
+                                            style="
+                                              top: -2.55em;
+                                              margin-left: -0.0576em;
+                                              margin-right: 0.05em;
+                                            "
+                                            ><span
+                                              class="pstrut"
+                                              style="height: 2.7em"
+                                            ></span
+                                            ><span
+                                              class="katex-sizing reset-size6 size3 mtight"
+                                              ><span
+                                                class="mord mathnormal mtight"
+                                                >t</span
+                                              ></span
+                                            ></span
+                                          ></span
+                                        ><span class="vlist-s">​</span></span
+                                      ><span class="vlist-r"
+                                        ><span
+                                          class="vlist"
+                                          style="height: 0.15em"
+                                          ><span></span></span></span></span></span></span></span></span
+                            ><span style="top: -3.23em"
+                              ><span class="pstrut" style="height: 3em"></span
+                              ><span
+                                class="frac-line"
+                                style="border-bottom-width: 0.04em"
+                              ></span></span
+                            ><span style="top: -3.677em"
+                              ><span class="pstrut" style="height: 3em"></span
+                              ><span class="mord"
+                                ><span class="mord"
+                                  ><span class="mord mathbb">E</span
+                                  ><span class="msupsub"
+                                    ><span class="vlist-t vlist-t2"
+                                      ><span class="vlist-r"
+                                        ><span
+                                          class="vlist"
+                                          style="height: 0.2806em"
+                                          ><span
+                                            style="
+                                              top: -2.55em;
+                                              margin-left: 0em;
+                                              margin-right: 0.05em;
+                                            "
+                                            ><span
+                                              class="pstrut"
+                                              style="height: 2.7em"
+                                            ></span
+                                            ><span
+                                              class="katex-sizing reset-size6 size3 mtight"
+                                              ><span
+                                                class="mord mathnormal mtight"
+                                                >t</span
+                                              ></span
+                                            ></span
+                                          ></span
+                                        ><span class="vlist-s">​</span></span
+                                      ><span class="vlist-r"
+                                        ><span
+                                          class="vlist"
+                                          style="height: 0.15em"
+                                          ><span></span></span></span></span></span></span
+                                ><span class="mopen">[</span
+                                ><span class="mord"
+                                  ><span
+                                    class="mord mathnormal"
+                                    style="margin-right: 0.0576em"
+                                    >E</span
+                                  ><span class="msupsub"
+                                    ><span class="vlist-t vlist-t2"
+                                      ><span class="vlist-r"
+                                        ><span
+                                          class="vlist"
+                                          style="height: 0.3011em"
+                                          ><span
+                                            style="
+                                              top: -2.55em;
+                                              margin-left: -0.0576em;
+                                              margin-right: 0.05em;
+                                            "
+                                            ><span
+                                              class="pstrut"
+                                              style="height: 2.7em"
+                                            ></span
+                                            ><span
+                                              class="katex-sizing reset-size6 size3 mtight"
+                                              ><span class="mord mtight"
+                                                ><span
+                                                  class="mord mathnormal mtight"
+                                                  >t</span
+                                                ><span class="mbin mtight"
+                                                  >+</span
+                                                ><span class="mord mtight"
+                                                  >1</span
+                                                ></span
+                                              ></span
+                                            ></span
+                                          ></span
+                                        ><span class="vlist-s">​</span></span
+                                      ><span class="vlist-r"
+                                        ><span
+                                          class="vlist"
+                                          style="height: 0.2083em"
+                                          ><span></span></span></span></span></span></span
+                                ><span class="mclose">]</span></span
+                              ></span
+                            ></span
+                          ><span class="vlist-s">​</span></span
+                        ><span class="vlist-r"
+                          ><span class="vlist" style="height: 0.836em"
+                            ><span></span></span></span></span></span
+                    ><span class="mclose nulldelimiter"></span></span
+                  ><span class="mopen">(</span><span class="mord">1</span
+                  ><span class="mspace" style="margin-right: 0.2222em"></span
+                  ><span class="mbin">+</span
+                  ><span
+                    class="mspace"
+                    style="margin-right: 0.2222em"
+                  ></span></span
+                ><span class="katex-base"
+                  ><span
+                    class="katex-strut"
+                    style="height: 1em; vertical-align: -0.25em"
+                  ></span
+                  ><span class="mord"
+                    ><span class="mord mathnormal">i</span
+                    ><span class="msupsub"
+                      ><span class="vlist-t"
+                        ><span class="vlist-r"
+                          ><span class="vlist" style="height: 0.7387em"
+                            ><span style="top: -3.113em; margin-right: 0.05em"
+                              ><span class="pstrut" style="height: 2.7em"></span
+                              ><span
+                                class="katex-sizing reset-size6 size3 mtight"
+                                ><span class="mord mtight"
+                                  ><span class="mord mtight">∗</span></span
+                                ></span
+                              ></span
+                            ></span
+                          ></span
+                        ></span
+                      ></span
+                    ></span
+                  ><span class="mclose">)</span></span
+                ></span
+              ></span
+            ></span
+          ></div
+        ><p
+          >在风险中性等假设下的未抛补预期收益相等式；没有远期合约消除汇率风险。</p
+        ></div
+      ></section
+    ><section id="theory-model" class="theory-model"
+      ><div
+        data-view="ReadingFigure"
+        data-props='{"kind":"cip-cashflow"}'
+        style="display: contents"
+      ></div
+      ><p class="theory-model-caption"
+        >图中的数值用于演示上述关系。模型条件与原始理论的区别见图下说明。</p
+      ></section
+    ><section class="theory-sources" id="theory-sources"
+      ><h2>原著与参考文献</h2
+      ><ol
+        ><li
+          ><a
+            href="https://www.gutenberg.org/ebooks/65278"
+            target="_blank"
+            rel="noreferrer"
+            >A Tract on Monetary Reform · 全文<svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-arrow-up-right"
+            >
+              <path d="M7 7h10v10"></path>
+              <path d="M7 17 17 7"></path></svg></a
+          ><p
+            >1923 年原著电子版；引文谈可供即期与远期套利使用的流动资本。</p
+          ></li
+        ></ol
+      ></section
+    ><section class="theory-connections"
+      ><h2>接着读</h2
+      ><div class="theory-related"
+        ><a href="#theory/ppp"
+          ><span>1918 · 代表论文</span><strong>卡塞尔：购买力平价</strong
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-arrow-right"
+          >
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path></svg></a
+        ><a href="#theory/overshooting"
+          ><span>1976</span><strong>多恩布什：汇率超调</strong
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-arrow-right"
+          >
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path></svg></a
+        ><a href="#theory/portfolio-balance"
+          ><span>1970 起 · 1970 年代发展</span
+          ><strong>资产组合平衡：存量、风险与汇率</strong
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-arrow-right"
+          >
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path></svg></a></div
+      ><details class="theory-course-links" open=""
+        ><summary
+          >课程中的相关章节<svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-chevron-right"
+          >
+            <path d="m9 18 6-6-6-6"></path></svg></summary
+        ><a href="#learn/fx-market/fx-market-s1"
+          >外汇市场与汇率报价<svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-arrow-up-right"
+          >
+            <path d="M7 7h10v10"></path>
+            <path d="M7 17 17 7"></path></svg></a
+        ><a href="#learn/short-run/short-run-s2"
+          >短期汇率：利率平价与资产定价<svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-arrow-up-right"
+          >
+            <path d="M7 7h10v10"></path>
+            <path d="M7 17 17 7"></path></svg></a
+        ><a href="#learn/enterprise/enterprise-s1"
+          >中国企业出海：融资与汇率风险管理<svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-arrow-up-right"
+          >
+            <path d="M7 7h10v10"></path>
+            <path d="M7 17 17 7"></path></svg></a></details></section
+    ><nav class="lesson-pagination" aria-label="按年代继续阅读"
+      ><a href="#theory/ppp"
+        ><svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-arrow-left"
+        >
+          <path d="m12 19-7-7 7-7"></path>
+          <path d="M19 12H5"></path></svg
+        ><span><small>1918 · 代表论文</small>卡塞尔：购买力平价</span></a
+      ><a href="#theory/clearing-union"
+        ><span
+          ><small>1943 · 公开方案；1941 起草</small
+          >凯恩斯：国际清算联盟与对称调整</span
+        ><svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-arrow-right"
+        >
+          <path d="M5 12h14"></path>
+          <path d="m12 5 7 7-7 7"></path></svg></a></nav></article
+></main>
+<script type="application/json" data-page-meta>
+  {
+    "id": "interest-parity",
+    "year": 1923,
+    "kind": "theory",
+    "lessonIds": ["fx-market", "short-run", "enterprise"],
+    "terms": ["利率平价", "CIP", "UIP", "远期升贴水", "抛补"],
+    "related": ["ppp", "overshooting", "portfolio-balance"],
+    "figure": "cip-cashflow"
+  }
+</script>

@@ -1,6 +1,8 @@
 # 国际金融课程网站
 
-[访问课程网站](https://wybzbdgh.github.io/international-finance-atlas/)
+[访问课程网站](https://wybzbdgh.github.io/international-finance-atlas/) · [修改指南](docs/editing.md)
+
+技术结构为 HTML、CSS 和 JavaScript，无 TypeScript、JSX 或 React。正文放在独立的 HTML 文件中；原有外观、地图与课程交互保留。
 
 国际金融课程小组网站，包含每日参考汇率地图、课程读本和理论深思。读本按课程大纲的六个模块组织，覆盖讲义的 20 个专题，配有历史案例、随文图表及 40 道练习。理论深思按原著年代组织 46 篇文章，解释原著背景、假设、推导与争论。
 
@@ -41,9 +43,9 @@
 
 各篇附原著入口。可核对的原文使用短摘，译文单独标注；解读结合用户提供的课程讲义编写，不能视为原作者逐字表述。现代论文没有全文转载。课程正文首次出现的相关术语链接至文章；返回课程时恢复阅读位置。相关课程入口可定位到正文小节。
 
-- 内容：src/theory-early.ts、src/theory-modern.ts。
+- 内容：public/pages/theory/，每篇文章一个 HTML 文件。
 - 来源核查：docs/theory-sources-early.md、docs/theory-sources-modern.md。
-- 轻量导航索引由 scripts/build-theory-index.mjs 在构建前生成，完整文章在打开理论模块时加载。
+- 搜索与导航索引由 scripts/build-content.mjs 从 HTML 生成，文章按需加载。
 - 字体：思源宋体用于阅读；思源黑体与 Inter 用于界面和数字；KaTeX 排版公式。四份中文字体子集覆盖实际正文，生成方式见 src/assets/fonts/README.md。
 
 ## 数据与模型口径
@@ -92,21 +94,23 @@
 
 ## 维护
 
-- src/course-data.json：模块、20 篇正文、案例、文献、公式、表格与练习。
-- src/content.ts：数据类型、路由及课程统计。
-- src/lib/models.ts：套利、融资、债务、套期与储备计算。
-- src/lib/fx.ts：货币对套算、相对涨跌与历史序列整理。
-- src/lib/activities.ts：回购融资账目与货币体系情景条件。
-- src/activities-data.ts：随文交互中的例子、制度对照与讲义摘录。
-- src/components/ReadingActivity.tsx：八种随文交互。
-- src/components/Experiments.tsx：交互入口、记账、政策、危机与支付。
-- src/components/AdvancedExperiments.tsx：其他计算工具。
-- src/components/ExperimentUI.tsx：控件、数值格式与图表。
-- src/components/WorldAtlas.tsx：地图图层、国家选择、时间回放、币种和金额换算。
-- src/components/AtlasMap.tsx、AtlasCharts.tsx：WebGL 地图与交互历史曲线。
-- src/map-data.ts、currency-names.ts：带日期的币种映射、IMF 制度分类及中文币种名称。
-- src/lib/atlas-models.ts、atlas-rates.ts：共享日期的指数比较、汇率查询缓存和状态。
-- src/App.tsx：课程编排、导航、搜索及主题切换。
+- public/pages/course/：课程目录、20 篇正文、案例、文献、公式、表格与练习。
+- public/pages/theory/：年代目录与 46 篇理论文章。
+- src/course-data.json、theory-data.json、theory-index.json：自动生成的数据，不直接编辑。
+- src/content.js：课程导航与专题别名。
+- src/lib/models.js：套利、融资、债务、套期与储备计算。
+- src/lib/fx.js：货币对套算、相对涨跌与历史序列整理。
+- src/lib/activities.js：回购融资账目与货币体系情景条件。
+- src/activities-data.js：随文交互中的例子、制度对照与讲义摘录。
+- src/components/ReadingActivity.js：八种随文交互。
+- src/components/Experiments.js：交互入口、记账、政策、危机与支付。
+- src/components/AdvancedExperiments.js：其他计算工具。
+- src/components/ExperimentUI.js：控件、数值格式与图表。
+- src/components/WorldAtlas.js：地图图层、国家选择、时间回放、币种和金额换算。
+- src/components/AtlasMap.js、AtlasCharts.js：WebGL 地图与交互历史曲线。
+- src/map-data.js、currency-names.js：带日期的币种映射、IMF 制度分类及中文币种名称。
+- src/lib/atlas-models.js、atlas-rates.js：共享日期的指数比较、汇率查询缓存和状态。
+- src/main.js：文章加载、导航与主题切换；src/course-directory.js：全文搜索及练习。
 - src/styles.css：字体、主题和阅读布局。
 
 更新正文时对照讲义口径；更新计算时核对币种、单位、期限、现金流与符号。发布前构建并检查数值、路由、地图选择和手机布局。

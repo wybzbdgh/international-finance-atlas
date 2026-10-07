@@ -16,7 +16,9 @@ if len(font_paths) not in (2, 4):
 destination = ROOT / 'src/assets/fonts'
 destination.mkdir(parents=True, exist_ok=True)
 
-text = ''.join(p.read_text() for p in (ROOT / 'src').rglob('*') if p.suffix in {'.ts', '.tsx', '.css', '.json'})
+text = ''.join(p.read_text() for p in (ROOT / 'src').rglob('*') if p.suffix in {'.js', '.css', '.json'})
+text += ''.join(p.read_text() for p in (ROOT / 'public/pages').rglob('*.html'))
+text += (ROOT / 'index.html').read_text()
 text += (ROOT / 'public/data/countries.json').read_text()
 text += ''.join(chr(i) for i in range(32, 127))
 text += '−–—×÷≈≠≤≥∗πρ∆¥￥€£→←↑↓＋％［］（）【】《》“”‘’：；！？、。·'
