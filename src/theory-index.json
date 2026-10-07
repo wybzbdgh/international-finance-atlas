@@ -5,6 +5,7 @@
     "yearLabel": "公元前 4 世纪",
     "title": "亚里士多德：交换、货币与价值尺度",
     "authors": "Aristotle",
+    "originalTitle": "Politics, Book I; Nicomachean Ethics, Book V",
     "kind": "history",
     "question": "不同物品为何能交换，货币在其中承担什么职能？",
     "lessonIds": [
@@ -23,6 +24,7 @@
     "yearLabel": "战国至汉初 · 成书年代有争议",
     "title": "《管子》：货币、物价与国家储备",
     "authors": "《管子》诸篇作者",
+    "originalTitle": "《管子·国蓄》等轻重诸篇",
     "kind": "history",
     "question": "谷物与货币的数量、储藏和流通，怎样影响价格与分配？",
     "lessonIds": [
@@ -41,6 +43,7 @@
     "yearLabel": "约 1350 年代",
     "title": "奥雷斯姆：铸币权与货币贬质",
     "authors": "Nicole Oresme",
+    "originalTitle": "De moneta",
     "kind": "history",
     "question": "统治者拥有铸币权，是否就可以任意改变钱币的含金属量？",
     "lessonIds": [
@@ -60,6 +63,7 @@
     "yearLabel": "1664 · 遗稿出版",
     "title": "托马斯·孟：贸易差额与贵金属积累",
     "authors": "Thomas Mun",
+    "originalTitle": "England’s Treasure by Forraign Trade",
     "kind": "history",
     "question": "一国能否通过持续出口多于进口来增加财富？",
     "lessonIds": [
@@ -78,6 +82,7 @@
     "yearLabel": "1752",
     "title": "休谟：价格—铸币流动机制",
     "authors": "David Hume",
+    "originalTitle": "Of the Balance of Trade",
     "kind": "theory",
     "question": "一个贸易国家的金银会不会不断流失，直至完全耗尽？",
     "lessonIds": [
@@ -97,6 +102,7 @@
     "yearLabel": "1810 · 金块论争",
     "title": "李嘉图：纸币发行、黄金价格与兑换约束",
     "authors": "David Ricardo",
+    "originalTitle": "The High Price of Bullion; On the Principles of Political Economy and Taxation, Chapter 27",
     "kind": "theory",
     "question": "黄金的纸币价格上涨，是黄金变贵，还是纸币的价值下降？",
     "lessonIds": [
@@ -116,6 +122,7 @@
     "yearLabel": "1918 · 代表论文",
     "title": "卡塞尔：购买力平价",
     "authors": "Gustav Cassel",
+    "originalTitle": "Abnormal Deviations in International Exchanges",
     "kind": "theory",
     "question": "两国物价变化怎样构成汇率的长期参照？",
     "lessonIds": [
@@ -135,6 +142,7 @@
     "yearLabel": "1923 · 系统论述",
     "title": "凯恩斯：远期外汇与利率平价",
     "authors": "John Maynard Keynes",
+    "originalTitle": "A Tract on Monetary Reform",
     "kind": "theory",
     "question": "换汇、存款再用远期锁定汇率，能够稳定多赚一份利差吗？",
     "lessonIds": [
@@ -156,6 +164,7 @@
     "yearLabel": "1943 · 公开方案；1941 起草",
     "title": "凯恩斯：国际清算联盟与对称调整",
     "authors": "John Maynard Keynes",
+    "originalTitle": "Proposals for an International Clearing Union",
     "kind": "proposal",
     "question": "国际收支调整为什么不能只要求逆差国家紧缩？",
     "lessonIds": [
@@ -177,6 +186,7 @@
     "yearLabel": "1944 · 勒纳的系统表述",
     "title": "弹性分析：马歇尔—勒纳条件与 J 曲线",
     "authors": "Alfred Marshall · Abba P. Lerner · Stephen P. Magee",
+    "originalTitle": "The Economics of Control; Currency Contracts, Pass-Through, and Devaluation",
     "kind": "theory",
     "question": "本币贬值以后，贸易收支一定改善吗？",
     "lessonIds": [
@@ -197,6 +207,7 @@
     "yearLabel": "1951 起 · 1950—1960 年代发展",
     "title": "米德与斯旺：内部均衡和外部均衡",
     "authors": "James E. Meade · Trevor W. Swan",
+    "originalTitle": "The Balance of Payments; Longer-Run Problems of the Balance of Payments",
     "kind": "theory",
     "question": "怎样同时处理失业、通胀与不可持续的对外失衡？",
     "lessonIds": [
@@ -217,6 +228,7 @@
     "yearLabel": "1952",
     "title": "亚历山大：国际收支的吸收分析",
     "authors": "Sidney S. Alexander",
+    "originalTitle": "Effects of a Devaluation on a Trade Balance",
     "kind": "theory",
     "question": "贬值怎样通过总产出与国内支出影响贸易余额？",
     "lessonIds": [
@@ -236,6 +248,7 @@
     "yearLabel": "1953 · 收入论文集",
     "title": "弗里德曼：浮动汇率的论证",
     "authors": "Milton Friedman",
+    "originalTitle": "The Case for Flexible Exchange Rates",
     "kind": "proposal",
     "question": "国际相对价格需要改变时，应主要调整汇率，还是国内工资和物价？",
     "lessonIds": [
@@ -255,6 +268,7 @@
     "yearLabel": "1957",
     "title": "波拉克：国际收支与国内信贷",
     "authors": "Jacques J. Polak",
+    "originalTitle": "Monetary Analysis of Income Formation and Payments Problems",
     "kind": "theory",
     "question": "国内信贷扩张怎样转化为进口增加与外汇储备减少？",
     "lessonIds": [
@@ -275,6 +289,7 @@
     "yearLabel": "1960 · 专著出版",
     "title": "特里芬：储备供给与美元信用",
     "authors": "Robert Triffin",
+    "originalTitle": "Gold and the Dollar Crisis: The Future of Convertibility",
     "kind": "theory",
     "question": "世界需要更多美元储备，为什么又会削弱美元兑金的可信度？",
     "lessonIds": [
@@ -294,6 +309,7 @@
     "yearLabel": "1961",
     "title": "蒙代尔：最优货币区",
     "authors": "Robert A. Mundell",
+    "originalTitle": "A Theory of Optimum Currency Areas",
     "kind": "theory",
     "question": "什么样的经济区域适合共用一种货币？",
     "lessonIds": [
@@ -314,6 +330,7 @@
     "yearLabel": "1962—1963",
     "title": "蒙代尔—弗莱明：汇率制度与政策效力",
     "authors": "J. Marcus Fleming · Robert A. Mundell",
+    "originalTitle": "Domestic Financial Policies under Fixed and under Floating Exchange Rates; Capital Mobility and Stabilization Policy under Fixed and Flexible Exchange Rates",
     "kind": "theory",
     "question": "同样的财政或货币扩张，为何在不同汇率制度下产生不同结果？",
     "lessonIds": [
@@ -335,6 +352,7 @@
     "yearLabel": "1964",
     "title": "巴拉萨—萨缪尔森：生产率与实际升值",
     "authors": "Béla Balassa · Paul A. Samuelson",
+    "originalTitle": "The Purchasing-Power Parity Doctrine: A Reappraisal; Theoretical Notes on Trade Problems",
     "kind": "theory",
     "question": "为什么生产率较高的经济体，本地服务和综合物价往往也较高？",
     "lessonIds": [
@@ -354,6 +372,7 @@
     "yearLabel": "1970 起 · 1970 年代发展",
     "title": "资产组合平衡：存量、风险与汇率",
     "authors": "William H. Branson · Pentti J. K. Kouri 等",
+    "originalTitle": "Monetary Policy and the New View of International Capital Movements",
     "kind": "theory",
     "question": "投资者已经持有多少本外币资产，会不会影响下一笔跨境交易？",
     "lessonIds": [
@@ -375,6 +394,7 @@
     "yearLabel": "1976 · 代表论文",
     "title": "货币分析法：货币供求与长期汇率",
     "authors": "Jacob A. Frenkel · Michael Mussa 等",
+    "originalTitle": "A Monetary Approach to the Exchange Rate: Doctrinal Aspects and Empirical Evidence",
     "kind": "theory",
     "question": "货币供给变化何时会转化为物价上涨和本币贬值？",
     "lessonIds": [
@@ -393,6 +413,7 @@
     "yearLabel": "1976",
     "title": "多恩布什：汇率超调",
     "authors": "Rudiger Dornbusch",
+    "originalTitle": "Expectations and Exchange Rate Dynamics",
     "kind": "theory",
     "question": "市场预期理性时，汇率为什么仍会在冲击后超过新的长期水平？",
     "lessonIds": [
@@ -412,6 +433,7 @@
     "yearLabel": "1979 工作论文 · 1980 期刊",
     "title": "储蓄与投资为何仍紧密相连",
     "authors": "Martin Feldstein · Charles Horioka",
+    "originalTitle": "Domestic Saving and International Capital Flows",
     "kind": "puzzle",
     "question": "资本可以跨境流动，为什么一国投资仍与本国储蓄高度相关？",
     "lessonIds": [
@@ -430,6 +452,7 @@
     "yearLabel": "1979",
     "title": "克鲁格曼：第一代货币危机模型",
     "authors": "Paul Krugman",
+    "originalTitle": "A Model of Balance-of-Payments Crises",
     "kind": "theory",
     "question": "既然外汇储备尚未耗尽，为什么投机冲击会提前发生？",
     "lessonIds": [
@@ -450,6 +473,7 @@
     "yearLabel": "1981 · 1994/1995 系统综述",
     "title": "经常账户的跨期分析",
     "authors": "Jeffrey Sachs · Maurice Obstfeld · Kenneth Rogoff",
+    "originalTitle": "The Current Account and Macroeconomic Adjustment in the 1970s",
     "kind": "theory",
     "question": "今天的顺差或逆差，怎样反映对未来收入和投资机会的判断？",
     "lessonIds": [
@@ -469,6 +493,7 @@
     "yearLabel": "1981",
     "title": "主权债务与偿付意愿",
     "authors": "Jonathan Eaton · Mark Gersovitz",
+    "originalTitle": "Debt with Potential Repudiation: Theoretical and Empirical Analysis",
     "kind": "theory",
     "question": "缺少通常的破产清算程序，为什么国家仍会偿还对外债务？",
     "lessonIds": [
@@ -489,6 +514,7 @@
     "yearLabel": "1983",
     "title": "银行挤兑与流动性保险",
     "authors": "Douglas Diamond · Philip Dybvig",
+    "originalTitle": "Bank Runs, Deposit Insurance, and Liquidity",
     "kind": "theory",
     "question": "长期资产本来能够偿付，银行为什么仍会遭遇挤兑？",
     "lessonIds": [
@@ -509,6 +535,7 @@
     "yearLabel": "1983",
     "title": "汇率预测与随机游走",
     "authors": "Richard Meese · Kenneth Rogoff",
+    "originalTitle": "Empirical Exchange Rate Models of the Seventies: Do They Fit Out of Sample?",
     "kind": "puzzle",
     "question": "为什么复杂的汇率模型，常常难以胜过“下一期等于这一期”？",
     "lessonIds": [
@@ -529,6 +556,7 @@
     "yearLabel": "1984",
     "title": "远期溢价之谜",
     "authors": "Eugene Fama",
+    "originalTitle": "Forward and Spot Exchange Rates",
     "kind": "puzzle",
     "question": "高利率货币为什么未必按利率平价所预测的幅度贬值？",
     "lessonIds": [
@@ -549,6 +577,7 @@
     "yearLabel": "1990",
     "title": "卢卡斯悖论",
     "authors": "Robert Lucas",
+    "originalTitle": "Why Doesn't Capital Flow from Rich to Poor Countries?",
     "kind": "puzzle",
     "question": "资本稀缺的经济体，为什么没有吸引理论所预言的大规模资金流入？",
     "lessonIds": [
@@ -568,6 +597,7 @@
     "yearLabel": "1991",
     "title": "国际资产组合的本国偏好",
     "authors": "Kenneth French · James Poterba",
+    "originalTitle": "Investor Diversification and International Equity Markets",
     "kind": "puzzle",
     "question": "跨国分散投资能够降低风险，投资者为什么仍集中持有本国资产？",
     "lessonIds": [
@@ -587,6 +617,7 @@
     "yearLabel": "1993",
     "title": "国际货币的接受网络",
     "authors": "Kiminori Matsuyama · Nobuhiro Kiyotaki · Akihiko Matsui",
+    "originalTitle": "Toward a Theory of International Currency",
     "kind": "theory",
     "question": "没有统一指定世界货币，某一种货币为什么会被广泛接受？",
     "lessonIds": [
@@ -608,6 +639,7 @@
     "yearLabel": "1994 工作论文 · 1995 期刊",
     "title": "新开放经济宏观经济学",
     "authors": "Maurice Obstfeld · Kenneth Rogoff",
+    "originalTitle": "Exchange Rate Dynamics Redux",
     "kind": "theory",
     "question": "怎样在同一模型中讨论价格黏性、跨期选择和政策的福利影响？",
     "lessonIds": [
@@ -628,6 +660,7 @@
     "yearLabel": "1994",
     "title": "第二代货币危机：政策选择与预期",
     "authors": "Maurice Obstfeld",
+    "originalTitle": "The Logic of Currency Crises",
     "kind": "theory",
     "question": "外汇储备尚未耗尽，政府为什么可能主动放弃固定汇率？",
     "lessonIds": [
@@ -648,6 +681,7 @@
     "yearLabel": "1998",
     "title": "资本流动的突然停止",
     "authors": "Guillermo Calvo",
+    "originalTitle": "Capital Flows and Capital-Market Crises: The Simple Economics of Sudden Stops",
     "kind": "theory",
     "question": "外部融资突然中断，怎样从国际收支传导到企业破产与产出下降？",
     "lessonIds": [
@@ -668,6 +702,7 @@
     "yearLabel": "1999 工作论文 · 2002 期刊",
     "title": "订单流与汇率微观结构",
     "authors": "Martin Evans · Richard Lyons",
+    "originalTitle": "Order Flow and Exchange Rate Dynamics",
     "kind": "theory",
     "question": "分散在企业、投资者和交易商手中的信息，怎样进入汇率？",
     "lessonIds": [
@@ -688,6 +723,7 @@
     "yearLabel": "1999",
     "title": "债务币种与“原罪”",
     "authors": "Barry Eichengreen · Ricardo Hausmann",
+    "originalTitle": "Exchange Rates and Financial Fragility",
     "kind": "theory",
     "question": "为什么一些经济体难以用本币对外借款，这会带来什么约束？",
     "lessonIds": [
@@ -709,6 +745,7 @@
     "yearLabel": "1999",
     "title": "第三代货币危机：资产负债表",
     "authors": "Paul Krugman 等",
+    "originalTitle": "Balance Sheets, the Transfer Problem, and Financial Crises",
     "kind": "theory",
     "question": "为什么贬值本应改善出口，却可能伴随投资与产出的崩塌？",
     "lessonIds": [
@@ -729,6 +766,7 @@
     "yearLabel": "2000 工作论文 · 2002 期刊",
     "title": "浮动恐惧",
     "authors": "Guillermo Calvo · Carmen Reinhart",
+    "originalTitle": "Fear of Floating",
     "kind": "puzzle",
     "question": "一些宣布浮动汇率的经济体，为什么仍频繁干预汇率？",
     "lessonIds": [
@@ -749,6 +787,7 @@
     "yearLabel": "2005 工作论文 · 2007 发表",
     "title": "国际金融中介与估值调整",
     "authors": "Pierre-Olivier Gourinchas · Hélène Rey",
+    "originalTitle": "From World Banker to World Venture Capitalist: US External Adjustment and the Exorbitant Privilege",
     "kind": "theory",
     "question": "对外资产和负债的结构，怎样改变经常账户与国际财富的关系？",
     "lessonIds": [
@@ -770,6 +809,7 @@
     "yearLabel": "2006 工作论文 · 2008 期刊",
     "title": "全球失衡与金融资产供给",
     "authors": "Ricardo Caballero · Emmanuel Farhi · Pierre-Olivier Gourinchas",
+    "originalTitle": "An Equilibrium Model of “Global Imbalances” and Low Interest Rates",
     "kind": "theory",
     "question": "为什么一些快速增长的经济体输出储蓄，而美国持续吸收资金？",
     "lessonIds": [
@@ -791,6 +831,7 @@
     "yearLabel": "2010 · 2011 定量扩展",
     "title": "宏观审慎政策与借贷外部性",
     "authors": "Olivier Jeanne · Anton Korinek · Javier Bianchi",
+    "originalTitle": "Excessive Volatility in Capital Flows: A Pigouvian Taxation Approach",
     "kind": "theory",
     "question": "每个借款者都按自身利益行事，为什么整体经济仍可能借得过多？",
     "lessonIds": [
@@ -812,6 +853,7 @@
     "yearLabel": "2013 演讲 · 2015 工作论文",
     "title": "全球金融周期与政策独立性",
     "authors": "Hélène Rey",
+    "originalTitle": "Dilemma not Trilemma: The Global Financial Cycle and Monetary Policy Independence",
     "kind": "theory",
     "question": "汇率已经浮动，为什么国内信贷与资产价格仍受全球金融条件影响？",
     "lessonIds": [
@@ -833,6 +875,7 @@
     "yearLabel": "2015 初稿 · 2017 工作论文 · 2018 期刊",
     "title": "抛补利率平价偏离与中介约束",
     "authors": "Wenxin Du · Alexander Tepper · Adrien Verdelhan",
+    "originalTitle": "Deviations from Covered Interest Rate Parity",
     "kind": "puzzle",
     "question": "已经锁定汇率的收益差，为什么没有被套利立即消除？",
     "lessonIds": [
@@ -854,6 +897,7 @@
     "yearLabel": "2016 工作论文 · 2020 期刊",
     "title": "主导货币定价",
     "authors": "Gita Gopinath · Emine Boz · Camila Casas · Federico Díez · Pierre-Olivier Gourinchas · Mikkel Plagborg-Møller",
+    "originalTitle": "Dominant Currency Paradigm",
     "kind": "theory",
     "question": "两国都不是美国，它们之间的贸易为什么仍受美元汇率影响？",
     "lessonIds": [
@@ -875,6 +919,7 @@
     "yearLabel": "2016 模型 · 2017 系统论述",
     "title": "安全资产短缺",
     "authors": "Ricardo Caballero · Emmanuel Farhi · Pierre-Olivier Gourinchas",
+    "originalTitle": "Safe Asset Scarcity and Aggregate Demand / The Safe Assets Shortage Conundrum",
     "kind": "theory",
     "question": "全球储蓄增加时，为什么安全资产的供给可能跟不上需求？",
     "lessonIds": [
@@ -896,6 +941,7 @@
     "yearLabel": "2019",
     "title": "数字货币、平台与货币区域",
     "authors": "Markus Brunnermeier · Harold James · Jean-Pierre Landau",
+    "originalTitle": "The Digitalization of Money",
     "kind": "theory",
     "question": "数字支付与平台网络，会怎样改变货币竞争和跨境使用？",
     "lessonIds": [

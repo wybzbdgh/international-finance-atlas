@@ -23,4 +23,4 @@ python -m pip install 'fonttools[woff]'
 python scripts/subset-fonts.py /path/to/SourceHanSerifCN-Regular.otf /path/to/SourceHanSerifCN-SemiBold.otf /path/to/SourceHanSansCN-Regular.otf /path/to/SourceHanSansCN-Medium.otf
 ```
 
-脚本会收集 `src/`（包括理论文章）与国家数据中的字符，并检查中文字形覆盖。每次增加正文，应重新生成四份子集。发布前通过浏览器 CSS.getPlatformFontsForNode 检查实际字形来源，不能仅根据 CSS font-family 声明判断字体已生效。
+脚本会收集 `public/pages/` 中的课程与理论文章、入口 `index.html`、`src/` 中的界面文字和国家数据，并检查中文字形覆盖。每次增加正文，应重新生成四份子集。发布前通过浏览器 CSS.getPlatformFontsForNode 检查实际字形来源，不能仅根据 CSS font-family 声明判断字体已生效。
