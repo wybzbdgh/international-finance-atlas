@@ -5,7 +5,6 @@
 .range-limits, .chart-labels, .chart-dates, .data-date { letter-spacing: 0; }
 .figure-plot svg text, .model-chart svg text { font-family: var(--font-sans); font-variant-numeric: tabular-nums; }
 .figure-insight { background: transparent; border: 0; padding: 0; }
-.reader-page.without-experiment { grid-template-columns: 180px minmax(0, 760px); column-gap: 70px; }
 .inline-experiment { margin: 28px 0 38px; }
 .inline-experiment .experiment-panel { max-height: none; overflow: visible; background: transparent; border-inline: 0; border-radius: 0; padding: 26px 0; }
 .inline-experiment .experiment-heading h2 { font: 600 20px/1.6 var(--font-serif); }
@@ -30,8 +29,7 @@
 .theory-loading { padding-block: 60px; min-height: 65dvh; }
 .theory-loading h1 { font-size: 40px; margin-bottom: 30px; }
 @media(min-width: 1000px) { .reader-page.without-experiment .lesson-intro h1 { font-size: 38px; } }
-@media(max-width: 1100px) { .reader-page.without-experiment { grid-template-columns: 150px minmax(0, 1fr); column-gap: 42px; } }
-@media(max-width: 1023px) { .reader-page.without-experiment { grid-template-columns: minmax(0, 760px); grid-template-areas: 'nav' 'intro' 'body'; } .lesson-theory-reading > div { grid-template-columns: 1fr; } }
+@media(max-width: 1023px) { .lesson-theory-reading > div { grid-template-columns: 1fr; } }
 @media(max-width: 600px) { .math-expression .katex { font-size: .95em; } .inline-experiment .experiment-panel { padding-inline: 0; } .lesson-theory-reading a { font-size: 13px; } .lesson-theory-reading a time { max-width: 68px; } }
 
 /* html supplies the shared 100px sticky-header offset. */
