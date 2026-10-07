@@ -224,13 +224,13 @@ svg { flex-shrink: 0; stroke-width: 1.6; }
 .order-copy h1 { font-size: clamp(38px, 3.8vw, 58px); line-height: 1.4; letter-spacing: .02em; }
 .order-copy .primary-button { margin-top: 32px; }
 
-/* Canonical course-content layout: 168px sidebar + 70px gap + 760px main column, centered.
-   Shared by #learn and #learn/<lesson-id>. The #learn hero is the only deliberate full-shell-width exception. */
+/* Unified course-content layout: sidebar + flexible main column that fills the shell.
+   Shared by #learn and #learn/<lesson-id>, aligned to match #map and #theory. */
 .course-overview,
 .reader-page.without-experiment {
   display: grid;
-  grid-template-columns: 168px minmax(0, 760px);
-  justify-content: center;
+  grid-template-columns: 168px minmax(0, 1fr);
+  justify-content: space-between;
   column-gap: 70px;
   padding-bottom: 60px;
 }
@@ -722,7 +722,7 @@ h4 { margin: 0; }
 
 @media (max-width: 1279px) {
   .course-overview,
-  .reader-page.without-experiment { grid-template-columns: 150px minmax(0, 760px); column-gap: 45px; }
+  .reader-page.without-experiment { grid-template-columns: 150px minmax(0, 1fr); column-gap: 45px; }
   .course-overview { row-gap: 48px; }
   .module-section { gap: 40px; }
 }
